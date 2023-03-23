@@ -11,4 +11,4 @@
     setContext('user', user);
 </script>
 
-<slot />
+<slot/>

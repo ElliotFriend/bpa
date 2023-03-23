@@ -1,20 +1,19 @@
-<div class="my-10 mx-20">
-    <div class="stats bg-primary text-primary-content">
-        <div class="stat">
-            <div class="stat-title">Lumens balance</div>
-            <div class="stat-value">89,400 XLM</div>
-            <div class="stat-actions">
-                <button class="btn btn-sm btn-success">Add funds</button>
-            </div>
-        </div>
+<script>
+    import AssetStats from "./AssetStats.svelte";
+    import RecentPayments from "./RecentPayments.svelte";
+    import FavoriteContacts from "./FavoriteContacts.svelte";
+    import TransferHistory from "./TransferHistory.svelte";
+</script>
 
-        <div class="stat">
-            <div class="stat-title">USDC balance</div>
-            <div class="stat-value">$250.<sup>13</sup></div>
-            <div class="stat-actions">
-                <button class="btn btn-sm">Withdrawal</button>
-                <button class="btn btn-sm">deposit</button>
-            </div>
-        </div>
-    </div>
+<div class="my-10 mx-20">
+    <AssetStats />
+</div>
+
+<div class="my-10 mx-20 grid grid-cols-1 xl:grid-cols-2 gap-10">
+    <RecentPayments />
+    <FavoriteContacts />
+</div>
+
+<div class="my-10 mx-20">
+    <TransferHistory />
 </div>

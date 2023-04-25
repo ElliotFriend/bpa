@@ -1,5 +1,5 @@
 import { KeyManager, KeyManagerPlugins, KeyType } from '@stellar/wallet-sdk';
-import { error } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 import { browser } from '$app/environment';
 import { page } from '$app/stores'
 
@@ -28,7 +28,7 @@ export const registerUser = (publicKey, secretKey, pincode, confirmPincode) => {
     }
 
     if (window.localStorage.getItem('bpa:keyId') !== null) {
-        throw error(400, 'user already registered. please login instead')
+        throw error(400, 'user already registered. please <a class="underline" href="/login">login</a> instead')
     }
 
     const keyManager = setupKeyManager();
@@ -54,23 +54,36 @@ export const registerUser = (publicKey, secretKey, pincode, confirmPincode) => {
         // loadUser()
         // TODO: redirect to dashboard
     })
-    .catch((e) => {
-        console.log("Error saving key: ", e.toString());
-        throw error(400, e.toString());
+    .catch((err) => {
+        console.log("Error saving key: ", err.toString());
+        throw error(400, err.toString());
+    })
+}
+
+export const loginUser = (keyId, pincode) => {
+    if (!browser) {
+        throw error(400, 'browser required for login')
+    }
+
+    const keyManager = setupKeyManager();
+    return keyManager.loadKey(keyId, pincode)
+    .catch((err) => {
+        console.log("Error loading key: ", err.toString())
+        throw error(400, 'incorrect pincode')
     })
 }
 
 // load the user when they try to login
-export const loadUser = (keyId, pincode) => {
-    if (browser) {
-        const keyManager = setupKeyManager();
+export const loadKeyId = () => {
+    if (!browser) {
+        throw error(400, 'browser required for login')
+    }
 
-        let bpaKeyId = window.localStorage.getItem('bpa:keyId');
-        let bpaPublicKey = window.localStorage.getItem('bpa:publicKey');
-        // console.log(keyManager.loadAllKeyIds())
-        keyManager.loadKey(keyId, pincode)
-        .then((what) => console.log("what", what))
+    let bpaKeyId = window.localStorage.getItem('bpa:keyId');
+    let bpaPublicKey = window.localStorage.getItem('bpa:publicKey');
+    // console.log(keyManager.loadAllKeyIds())
+    return {
+        bpaKeyId,
+        bpaPublicKey
     }
 }
-
-

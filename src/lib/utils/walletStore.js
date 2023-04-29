@@ -87,3 +87,14 @@ export const loadKeyId = () => {
         bpaPublicKey
     }
 }
+
+export const getSourcePublicKey = () => {
+    if (!browser) {
+        throw error(400, 'browser required to get public key from localStorage')
+    }
+    
+    let bpaPublicKey = JSON.parse(window.localStorage.getItem('bpa:publicKey'))
+    return {
+        bpaPublicKey
+    }
+}

@@ -13,11 +13,7 @@
         <!-- head -->
         <thead>
         <tr>
-            <th>
-            <label>
-                <input type="checkbox" class="checkbox" />
-            </label>
-            </th>
+            <th>Favorite</th>
             <th>Name</th>
             <th>Address</th>
             <th></th>
@@ -30,7 +26,12 @@
                 <tr>
                     <th>
                         <label>
-                            <input type="checkbox" class="checkbox" />
+                            <input 
+                                type="checkbox" 
+                                class="checkbox checkbox-success" 
+                                checked={contact.favorite}
+                                on:click={contacts.favorite(contact.id)}
+                            />
                         </label>
                     </th>
                     <td>

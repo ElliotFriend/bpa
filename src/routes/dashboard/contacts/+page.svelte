@@ -59,7 +59,7 @@
                 <th>Delete</th>
             </tr>
             </thead>
-        {#if contacts}
+        {#if $contacts}
             <tbody>
             {#each $contacts as contact}
             <tr>

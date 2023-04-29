@@ -1,3 +1,20 @@
+import { writable } from "svelte/store";
+
+export const localStore = (key, initial) => {
+    if (storageAvailable('localStorage')) {
+        const existing = localStorage.getItem(key)
+        const data = existing ? JSON.parse(existing) : initial
+
+        const store = writable(data, () => {
+            const unsubscribe = store.subscribe((value) => {
+                localStorage.setItem(key, JSON.stringify(value))
+            })
+            return unsubscribe
+        })
+        return store
+    }
+}
+
 export function storageAvailable(type) {
     let storage;
     try {

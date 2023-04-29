@@ -28,7 +28,7 @@
             registerUser($publicKey, $secretKey, $pincode, $confirmPincode)
             // console.log(keyId)
         } catch (err) {
-            console.log(err)
+            console.error(err)
             errorMessage.set(err.body.message)
         }
     }
@@ -92,6 +92,11 @@
                     </div>
                     <div class="form-control mt-6">
                         <button on:click={signup} class="btn btn-primary">Signup</button>
+                    </div>
+                    <div class="form-control">
+                        <label class="label">
+                            <a class="label-text-alt link link-hover" href="/login">Existing users can login here</a>
+                        </label>
                     </div>
                 </div>
             </div>

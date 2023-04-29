@@ -68,7 +68,7 @@ export const loginUser = (keyId, pincode) => {
     const keyManager = setupKeyManager();
     return keyManager.loadKey(keyId, pincode)
     .catch((err) => {
-        console.log("Error loading key: ", err.toString())
+        console.error("Error loading key: ", err.toString())
         throw error(400, 'incorrect pincode')
     })
 }

@@ -3,6 +3,7 @@
     import { derived, get } from 'svelte/store';
     import PinModal from '$lib/components/PinModal.svelte';
 
+
     const user = getContext('user');
     // let pinInput;
     // $: pinput = pinInput
@@ -23,6 +24,7 @@
             <p class="py-6">The app that lets you pay, <em>basically</em>, anyone.</p>
             <a href="/signup" class="btn btn-primary">Signup Now</a>
             <a href="/dashboard" class="btn">Dashboard</a>
+            <a href="#my-modal-2" class="btn">Modal</a>
         </div>
     </div>
 </div>

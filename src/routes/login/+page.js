@@ -1,6 +1,6 @@
 import { browser } from "$app/environment";
 import { error, redirect } from '@sveltejs/kit';
-import { storageAvailable } from '$lib/utils/storageAvailable';
+import { storageAvailable } from '$lib/stores/localStore';
 import { loadKeyId } from '$lib/utils/walletStore';
 
 export function load() {

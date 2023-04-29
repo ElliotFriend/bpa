@@ -14,11 +14,11 @@
     const login = async () => {
         try {
             errorMessage.set(null)
-            await loginUser(data.bpaKeyId, $pincode.toString())
+            await loginUser(data.bpaKeyId, $pincode?.toString())
             console.log('login successful?')
             goto('/dashboard')
         } catch (err) {
-            console.log(err)
+            console.error(err)
             errorMessage.set(err.body.message)
         }
     }

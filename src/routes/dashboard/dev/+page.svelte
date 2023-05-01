@@ -5,6 +5,7 @@
     import { fundWithFriendbot, startTransaction } from '$lib/utils/horizonQueries'
     import { fetchAssets } from '$lib/utils/stellarExpert'
     import { addContactTrustlines } from '$lib/utils/devHelpers'
+    import { modalStore } from '$lib/stores/modalStore'
 
     export let data
 
@@ -53,4 +54,8 @@
     <h2 class="text-3xl font-bold">Get Rich</h2>
     <p>Get your own account funded by friendbot</p>
     <button class="btn btn-success" on:click={fundWithFriendbot(data.bpaPublicKey)}>I need a friend!</button>
+    <h2 class="text-3xl font-bold">Launch Model Rocket</h2>
+    <p>Test the modal thing to see what comes up... I guess?</p>
+    <input type="text" bind:value={$modalStore.button} />
+    <label for="my-modal" class="btn btn-primary">open modal</label>
 </div>

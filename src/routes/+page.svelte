@@ -1,7 +1,9 @@
 <script>
+    import { modalStore } from '$lib/stores/modalStore'
     import { getContext } from 'svelte';
     import { derived, get } from 'svelte/store';
     import PinModal from '$lib/components/PinModal.svelte';
+    import TxPreviewModal from '$lib/components/txPreviewModal.svelte';
 
 
     const user = getContext('user');
@@ -29,9 +31,12 @@
     </div>
 </div>
 
+<!-- <TxPreviewModal /> -->
+
 <!-- <PinModal
 	header="Signup"
 	description="Please provide a 6-digit passcode to sign up. This passcode will be used to encrypt the secret key for your Stellar address. Your secret key will be stored on your device. You will be the only one to ever have custody over this key."
 	button="Signup"
     bind:this={pincode}
 /> -->
+

@@ -6,7 +6,7 @@
     <div class="prose">
         <div>
             <h1>About BasicPay</h1>
-            <p>There are over <strong>{data.num_records}</strong> on the Testnet alone. Learn how to harness that power in your app!</p>
+            <p>There are over <strong>{data.num_records} assets</strong> on the Testnet alone. Learn how to harness that power in your app!</p>
             <ul>
                 <li>The most recent asset issued was: <code>{data.most_recent.code}</code>.</li>
                 <li>It was issued by: <code>{data.most_recent.issuer}</code></li>

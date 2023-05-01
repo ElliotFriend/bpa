@@ -12,5 +12,5 @@ export async function fetchAssets() {
     })}`)
     let json = await res.json()
     // console.log(json)
-    return json
+    return json._embedded.records
 }

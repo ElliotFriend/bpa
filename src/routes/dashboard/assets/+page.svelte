@@ -4,9 +4,6 @@
 
     export let data
     let balancesPromise = getAccountBalances(data.bpaPublicKey)
-    // console.log('pageAssets', $page)
-
-    // let stellarExpertAssets = fetchAssets()
 </script>
 
 <div class="my-10 mx-20">

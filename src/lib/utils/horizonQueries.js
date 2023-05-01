@@ -1,5 +1,6 @@
 import { error } from "@sveltejs/kit";
 import { Server, Networks, TransactionBuilder } from "stellar-sdk";
+import { validPublicKey } from "./generateKeypair";
 
 const server = new Server('https://horizon-testnet.stellar.org');
 
@@ -46,5 +47,12 @@ export async function getAccountBalances(publicKey) {
     const { account } = await fetchAccount(publicKey)
     return {
         balances: account.balances
+    }
+}
+
+export async function fundWithFriendbot(publicKey) {
+    if (validPublicKey(publicKey)) {
+        const friendbotUrl = `https://friendbot.stellar.org?addr=${publicKey}`
+        await fetch(friendbotUrl)
     }
 }

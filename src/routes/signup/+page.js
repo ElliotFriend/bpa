@@ -3,7 +3,7 @@
 import { error } from '@sveltejs/kit';
 import { browser } from '$app/environment';
 import { writable } from 'svelte/store';
-import { storageAvailable } from '$lib/utils/storageAvailable';
+import { storageAvailable } from '$lib/stores/localStore';
 import { generateKeypair } from '$lib/utils/generateKeypair';
 
 export function load() {

@@ -1,3 +1,4 @@
+import { error } from "@sveltejs/kit";
 import { Server, Networks, TransactionBuilder } from "stellar-sdk";
 
 const server = new Server('https://horizon-testnet.stellar.org');
@@ -11,14 +12,26 @@ export async function fetchAccount(publicKey) {
 }
 
 export async function loadAccount(publicKey) {
-    const account = await server.loadAccount(publicKey)
-    return { 
-        account 
+    try {
+        const account = await server.loadAccount(publicKey)
+        return { 
+            funded: true,
+            account 
+        }
+    } catch (err) {
+        // We expect horizon to response with a 404 if the account isn't funded
+        if (err.response.status === 404){
+            return {
+                funded: false
+            }
+        } else {
+            throw error(err.response.status, `${err.response.title} - ${err.response.detail}`)
+        }
     }
 }
 
-export async function startTransaction(publicKey) {
-    const source = await loadAccount(publicKey)
+export async function startTransaction(sourcePublicKey) {
+    const source = await loadAccount(sourcePublicKey)
     const transaction = new TransactionBuilder(
         source.account, {
             networkPassphrase: Networks.TESTNET,
@@ -27,4 +40,11 @@ export async function startTransaction(publicKey) {
     )
 
     return transaction
+}
+
+export async function getAccountBalances(publicKey) {
+    const { account } = await fetchAccount(publicKey)
+    return {
+        balances: account.balances
+    }
 }

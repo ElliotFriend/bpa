@@ -1,5 +1,7 @@
 import { writable } from "svelte/store";
 
+// a type of store that abstracts the creation of a writable store, and mirrors
+// that writable store into localStorage
 export const localStore = (key, initial) => {
     if (storageAvailable('localStorage')) {
         const existing = localStorage.getItem(key)

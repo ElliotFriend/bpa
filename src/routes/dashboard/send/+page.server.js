@@ -1,42 +1,43 @@
-// import { TransactionBuilder, Server, Network } from 'stellar-sdk';
-import { startTransaction, loadAccount } from '$lib/utils/horizonQueries';
-import { Operation, Asset, MemoText, Memo } from 'stellar-sdk';
+import { startTransaction } from '$lib/utils/horizonQueries';
+import { Operation, Asset, Memo } from 'stellar-sdk';
 
 /** @type {import('./$types').Actions} */
 export const actions = {
     preview: async ({ request }) => {
+        // get the submitted form fields
         const data = await request.formData()
         const source = data.get('source')
         const destination = data.get('destination')
         const amount = data.get('amount')
         const memo = data.get('memo')
-        // get sequence number from horizon
+        const createAccount = data.get('createAccount')
+
+        // start the transaction
         let transaction = await startTransaction(source)
+
+        // add a memo if it was supplied
         if (memo) {
             transaction.addMemo(Memo.text(memo))
         }
-        // console.log(transaction)
-        try {
-            await loadAccount(destination)
+
+        // check if we need a `createAccount` operation, or if we need a
+        // `payment` operation
+        if (createAccount) {
+            transaction.addOperation(Operation.createAccount({
+                destination,
+                startingBalance: amount,
+            }))
+        } else {
             transaction.addOperation(Operation.payment({
                 destination,
                 amount,
                 asset: Asset.native(),
             }))
-        } catch (err) {
-            console.log('err', err)
-            transaction.addOperation(Operation.createAccount({
-                destination,
-                startingBalance: amount,
-            }))
         }
 
+        
         transaction = transaction.setTimeout(30).build()
-        // check if destination exists
-        // -> if exists add payment operation
-        // -> if not exists add createAccount operation
-        // check if memo was supplied
-        // -> if exists add memo to transaction
+
         console.log(transaction.toXDR())
         return { 
             transaction: transaction.toXDR()

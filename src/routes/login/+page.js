@@ -1,7 +1,7 @@
-import { browser } from "$app/environment";
-import { error, redirect } from '@sveltejs/kit';
-import { storageAvailable } from '$lib/stores/localStore';
-import { loadKeyId } from '$lib/utils/walletStore';
+import { browser } from '$app/environment'
+import { error, redirect } from '@sveltejs/kit'
+import { storageAvailable } from '$lib/stores/localStore'
+import { loadKeyId } from '$lib/utils/walletStore'
 
 export function load() {
     if (browser) {
@@ -14,5 +14,5 @@ export function load() {
         } else {
             throw error(400, 'local storage required')
         }
-    } 
+    }
 }

@@ -1,4 +1,4 @@
-import { browser } from "$app/environment";
+import { browser } from '$app/environment'
 import { storageAvailable } from '$lib/stores/localStore'
 
 /** @type {import('./$types').LayoutLoad} */
@@ -7,7 +7,7 @@ export function load() {
         if (storageAvailable('localStorage')) {
             const bpaPublicKey = JSON.parse(localStorage.getItem('bpa:publicKey'))
             return {
-                bpaPublicKey
+                bpaPublicKey,
             }
         }
     }

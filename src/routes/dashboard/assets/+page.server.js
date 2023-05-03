@@ -1,4 +1,4 @@
-import { startTransaction } from "$lib/utils/horizonQueries";
+import { startTransaction } from '$lib/utils/horizonQueries'
 import { Operation, Asset } from 'stellar-sdk'
 
 /** @type {import('./$types').Actions} */
@@ -11,23 +11,24 @@ export const actions = {
         const addAsset = data.get('addAsset')
 
         // create the Asset object
-        const assetObj = new Asset(
-            asset.split('-')[0],
-            asset.split('-')[1]
-        )
-        
+        const assetObj = new Asset(asset.split('-')[0], asset.split('-')[1])
+
         // start the transaction
         let transaction = await startTransaction(source)
 
         if (addAsset) {
-            transaction.addOperation(Operation.changeTrust({
-                asset: assetObj
-            }))
+            transaction.addOperation(
+                Operation.changeTrust({
+                    asset: assetObj,
+                })
+            )
         } else {
-            transaction.addOperation(Operation.changeTrust({
-                asset: assetObj,
-                limit: "0"
-            }))
+            transaction.addOperation(
+                Operation.changeTrust({
+                    asset: assetObj,
+                    limit: '0',
+                })
+            )
         }
 
         transaction = transaction.setTimeout(30).build()
@@ -35,7 +36,7 @@ export const actions = {
         console.log(transaction.toXDR())
 
         return {
-            transaction: transaction.toXDR()
+            transaction: transaction.toXDR(),
         }
     },
 }

@@ -1,17 +1,17 @@
 <script>
-    import { getContext } from 'svelte';
-    import { writable } from 'svelte/store';
-    const user = getContext('user');
-    const pinInput = writable();
+    import { getContext } from 'svelte'
+    import { writable } from 'svelte/store'
+    const user = getContext('user')
+    const pinInput = writable()
 
     export function grab() {
-        return $pinInput;
+        return $pinInput
     }
 
-    export let header;
-    export let description;
-    export let button;
-    export const value = $pinInput;
+    export let header
+    export let description
+    export let button
+    export const value = $pinInput
 </script>
 
 <input type="checkbox" id="pincode-modal" class="modal-toggle" />

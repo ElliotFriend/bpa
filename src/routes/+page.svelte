@@ -1,18 +1,17 @@
 <script>
-    import { modalStore } from '$lib/stores/modalStore'
-    import { getContext } from 'svelte';
-    import { derived, get } from 'svelte/store';
-    import PinModal from '$lib/components/PinModal.svelte';
-    import TxPreviewModal from '$lib/components/txPreviewModal.svelte';
+    // import { modalStore } from '$lib/stores/modalStore'
+    import { getContext } from 'svelte'
+    import { derived, get } from 'svelte/store'
+    // import PinModal from '$lib/components/PinModal.svelte';
+    // import TxPreviewModal from '$lib/components/TxPreviewModal.svelte';
 
-
-    const user = getContext('user');
+    const user = getContext('user')
     // let pinInput;
     // $: pinput = pinInput
     //     ? pinInput.grab()
     //     : "nevermind..."
 
-    let pincode;
+    let pincode
     // const view = derived(pin, $pin => `Your pincode was ${$pin}`)
     // $: view = pinput
     //     ? get(pinput)
@@ -39,4 +38,3 @@
 	button="Signup"
     bind:this={pincode}
 /> -->
-

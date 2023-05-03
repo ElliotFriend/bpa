@@ -1,4 +1,4 @@
-import { Keypair, StrKey } from 'stellar-sdk';
+import { Keypair, StrKey } from 'stellar-sdk'
 
 export function generateKeypair() {
     let kp = Keypair.random()

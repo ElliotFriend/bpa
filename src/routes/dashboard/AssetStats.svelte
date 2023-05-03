@@ -1,11 +1,11 @@
 <script>
     // import { page } from '$app/stores';
-    import { fetchAccount } from '$lib/utils/horizonQueries';
+    import { fetchAccount } from '$lib/utils/horizonQueries'
     // console.log('assetstats', $page.data.bpaPublicKey)
     // let balances = fetchAccount($page.data.bpaPublicKey)
     // console.log(balances)
-    export let bpaPublicKey;
-    let accountPromise = fetchAccount(bpaPublicKey);
+    export let bpaPublicKey
+    let accountPromise = fetchAccount(bpaPublicKey)
 </script>
 
 <div class="prose mt-2 mb-1">
@@ -21,7 +21,10 @@
         {#each account.balances as balance}
             <div class="stat">
                 <div class="stat-title">{balance.asset_code ?? 'XLM'} Balance</div>
-                <div class="stat-value">{parseFloat(balance.balance).toFixed(2)} {balance.asset_code ?? 'XLM'}</div>
+                <div class="stat-value">
+                    {parseFloat(balance.balance).toFixed(2)}
+                    {balance.asset_code ?? 'XLM'}
+                </div>
             </div>
         {/each}
     {:catch error}

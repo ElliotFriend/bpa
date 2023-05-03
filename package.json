@@ -32,8 +32,10 @@
     "type": "module",
     "dependencies": {
         "@stellar/wallet-sdk": "^0.9.0",
+        "rollup-plugin-node-resolve": "^5.2.0",
         "stellar-base": "^8.2.2",
         "stellar-sdk": "^10.4.1",
+        "svelte-simple-modal": "^1.5.2",
         "uuid": "^9.0.0"
     }
 }

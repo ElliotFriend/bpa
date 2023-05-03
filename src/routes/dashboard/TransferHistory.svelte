@@ -5,7 +5,7 @@
     <table class="table table-compact w-full">
         <thead>
             <tr>
-                <th></th>
+                <th />
                 <th>Amount</th>
                 <th>Asset</th>
                 <th>Direction</th>

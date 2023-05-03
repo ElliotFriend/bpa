@@ -1,11 +1,11 @@
 <script>
-    import AssetStats from "./AssetStats.svelte";
-    import RecentPayments from "./RecentPayments.svelte";
-    import FavoriteContacts from "./FavoriteContacts.svelte";
-    import TransferHistory from "./TransferHistory.svelte";
+    import AssetStats from './AssetStats.svelte'
+    import RecentPayments from './RecentPayments.svelte'
+    import FavoriteContacts from './FavoriteContacts.svelte'
+    import TransferHistory from './TransferHistory.svelte'
 
     /** @type {import('./$types').PageData} */
-    export let data;
+    export let data
     let bpaPublicKey = data.bpaPublicKey
 </script>
 

@@ -1,16 +1,16 @@
 <script>
-    import Modal from '$lib/components/Modal.svelte';
-    import '../app.postcss';
-    import { setContext } from 'svelte';
-    import { writable } from 'svelte/store';
+    // import Modal from '$lib/components/Modal.svelte';
+    import '../app.postcss'
+    import { setContext } from 'svelte'
+    import { writable } from 'svelte/store'
 
     /** @type {import('./$types').LayoutData} */
-    export let data;
+    export let data
 
-    const user = writable();
+    const user = writable()
     $: user.set(data.user)
 
-    setContext('user');
+    setContext('user')
 </script>
 
-<slot/>
+<slot />

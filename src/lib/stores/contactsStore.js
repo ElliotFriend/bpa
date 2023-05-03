@@ -11,25 +11,26 @@ function createContacts() {
 
         return {
             subscribe,
-            
+
             empty: () => set([]),
 
-            remove: (id) => update((list) => 
-                list.filter((contact) => contact.id !== id)),
-            
-            add: (contact) => update((list) => {
-                if (validPublicKey(contact.address)) {
-                    return [...list, {id: uuidv4(), ...contact}]
-                } else {
-                    throw error(400, "invalid public key")
-                }
-            }),
+            remove: (id) => update((list) => list.filter((contact) => contact.id !== id)),
 
-            favorite: (id) => update((list) => {
-                const i = list.findIndex((contact) => contact.id === id)
-                if (i >= 0) list[i].favorite = !list[i].favorite
-                return list
-            }),
+            add: (contact) =>
+                update((list) => {
+                    if (validPublicKey(contact.address)) {
+                        return [...list, { id: uuidv4(), ...contact }]
+                    } else {
+                        throw error(400, 'invalid public key')
+                    }
+                }),
+
+            favorite: (id) =>
+                update((list) => {
+                    const i = list.findIndex((contact) => contact.id === id)
+                    if (i >= 0) list[i].favorite = !list[i].favorite
+                    return list
+                }),
         }
     }
 }

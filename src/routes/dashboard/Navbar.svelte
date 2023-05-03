@@ -1,6 +1,6 @@
 <script>
     // import { page } from "$app/stores";
-    export let bpaPublicKey;
+    export let bpaPublicKey
 </script>
 
 <header class="navbar bg-base-300">
@@ -34,8 +34,8 @@
                         <span class="badge">New</span>
                     </a>
                 </li>
-                <li><a href="#" >Settings</a></li>
-                <li><a href="#" >Logout</a></li>
+                <li><a href="#">Settings</a></li>
+                <li><a href="#">Logout</a></li>
             </ul>
         </div>
     </div>

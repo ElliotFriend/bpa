@@ -1,12 +1,8 @@
-import { Server } from 'stellar-sdk';
+import { Server } from 'stellar-sdk'
 
 export async function load() {
-    const server = new Server('https://horizon-testnet.stellar.org');
-    let response = await server
-        .assets()
-        .limit(200)
-        .order("desc")
-        .call()
+    const server = new Server('https://horizon-testnet.stellar.org')
+    let response = await server.assets().limit(200).order('desc').call()
     let records = response.records
 
     return {
@@ -14,6 +10,6 @@ export async function load() {
         most_recent: {
             code: records[0].asset_code,
             issuer: records[0].asset_issuer,
-        }
+        },
     }
 }

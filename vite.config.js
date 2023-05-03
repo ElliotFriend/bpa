@@ -1,5 +1,5 @@
-import { sveltekit } from '@sveltejs/kit/vite';
-import { defineConfig } from 'vite';
+import { sveltekit } from '@sveltejs/kit/vite'
+import { defineConfig } from 'vite'
 
 import { NodeGlobalsPolyfillPlugin } from '@esbuild-plugins/node-globals-polyfill'
 
@@ -8,16 +8,16 @@ export default defineConfig({
     optimizeDeps: {
         esbuildOptions: {
             define: {
-                global: 'globalThis'
+                global: 'globalThis',
             },
             plugins: [
                 NodeGlobalsPolyfillPlugin({
-                    buffer: true
-                })
-            ]
-        }
+                    buffer: true,
+                }),
+            ],
+        },
     },
     ssr: {
-        noExternal: ['@stellar/wallet-sdk']
-    }
-});
+        noExternal: ['@stellar/wallet-sdk'],
+    },
+})

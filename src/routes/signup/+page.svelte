@@ -4,16 +4,26 @@
     import { onMount } from 'svelte'
     import { goto } from '$app/navigation'
 
-    import { registerUser } from '$lib/utils/walletStore'
+    import { getContext } from 'svelte'
+    const { open } = getContext('simple-modal')
+    // import { page } from '$app/stores'
+    /** @type {import('./$types').PageData} */
+    export let data;
+    // console.log('routes/signup/page page', $page.data)
+
+    import { registerUser, walletStore } from '$lib/stores/walletStore'
     import { generateKeypair } from '$lib/utils/generateKeypair'
+    import PinModal from '$lib/components/PinModal.svelte'
+    import { modal, modalStore } from '$lib/stores/modalStore'
+    import { bind } from 'svelte-simple-modal'
 
     let keypair = writable()
     let publicKey = writable()
     let secretKey = writable()
     let showSecret = writable(false)
     let pincode = writable()
-    let confirmPincode = writable()
-    let errorMessage = writable()
+    // let confirmPincode = writable()
+    let errorMessage = writable(null)
 
     const newKeypair = () => {
         if (browser) {
@@ -23,23 +33,49 @@
         }
     }
 
-    const signup = async () => {
-        try {
-            errorMessage.set(null)
-            registerUser($publicKey, $secretKey, $pincode, $confirmPincode)
-            // console.log(keyId)
-            await fetch('/signup', {
-                method: 'POST',
-                body: JSON.stringify({ publicKey: $publicKey }),
-                headers: {
-                    'Content-Type': 'application/json',
+    const signup = () => {
+        // console.log($walletStore)
+        open(PinModal,
+            {
+                firstPincode: $pincode,
+                hasPincodeForm: true,
+                hasTransaction: false,
+                title: "Confirm Pincode",
+                body: "Please confirm your pincode",
+            }, { /* `svelte-simple-modal` options would go here */ },
+            {
+                onOpen: () => {
+                    $modalStore.errorMessage = null
                 },
-            })
-            goto('/dashboard')
-        } catch (err) {
-            console.error(err)
-            errorMessage.set(err.body.message)
-        }
+                onOpened: () => {
+                    $modalStore.confirmingPincode = true
+                },
+                onClose: () => {
+                    if ($modalStore.errorMessage) {
+                        errorMessage.set($modalStore.errorMessage)
+                    } else if (!$modalStore.confirmingPincode) {
+                        errorMessage.set(null)
+                        walletStore.register($publicKey, $secretKey, $pincode)
+                    }
+                },
+                onClosed: () => {
+                    if ($walletStore.publicKey) {
+                        goto('/dashboard')
+                    }
+                }
+            }
+        )
+        // walletStore.register($publicKey, $secretKey, $pincode)
+        // walletStore.register(kmId, $publicKey)
+        // console.log(keyId)
+        // await fetch('/signup', {
+        //     method: 'POST',
+        //     body: JSON.stringify({ publicKey: $publicKey }),
+        //     headers: {
+        //         'Content-Type': 'application/json',
+        //     },
+        // })
+        // goto('/dashboard')
     }
 
     onMount(() => {
@@ -128,17 +164,7 @@
                             id="pincode"
                             class="input input-bordered"
                             bind:value={$pincode}
-                        />
-                    </div>
-                    <div class="form-control">
-                        <label for="confirmPincode" class="label">
-                            <span class="label-text">Confirm Pincode</span>
-                        </label>
-                        <input
-                            type="number"
-                            id="confirmPincode"
-                            class="input input-bordered"
-                            bind:value={$confirmPincode}
+                            on:keydown={e => e.key === 'Enter' && signup()}
                         />
                     </div>
                     <div class="form-control mt-6">

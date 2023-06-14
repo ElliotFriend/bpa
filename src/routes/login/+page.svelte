@@ -3,10 +3,10 @@
     import { goto } from '$app/navigation'
     import { browser } from '$app/environment'
     import { writable } from 'svelte/store'
-    import { loginUser } from '$lib/utils/walletStore'
+    import { loginUser } from '$lib/stores/walletStore'
 
     export let data
-    console.log(data)
+    console.log('/login data', data)
 
     let pincode = writable()
     let errorMessage = writable()
@@ -14,7 +14,7 @@
     const login = async () => {
         try {
             errorMessage.set(null)
-            await loginUser(data.bpaKeyId, $pincode?.toString())
+            await loginUser(data.keyId, $pincode?.toString())
             console.log('login successful?')
             goto('/dashboard')
         } catch (err) {

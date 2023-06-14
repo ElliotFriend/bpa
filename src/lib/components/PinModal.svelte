@@ -1,37 +1,117 @@
 <script>
-    import { getContext } from 'svelte'
-    import { writable } from 'svelte/store'
-    const user = getContext('user')
-    const pinInput = writable()
+    import { error } from '@sveltejs/kit'
+    import { goto } from '$app/navigation'
+    import { modalStore } from '$lib/stores/modalStore'
+    import { walletStore, confirmCorrectPincode } from '$lib/stores/walletStore'
+    import { TransactionBuilder, Networks } from 'stellar-sdk'
+    import { submit } from '$lib/utils/horizonQueries'
 
-    export function grab() {
-        return $pinInput
+    const { close } = getContext('simple-modal')
+
+    export let title = 'Transaction Preview'
+    export let body = 'Please confirm the transaction below in order to sign and submit it to the network'
+    export let firstPincode
+    export let hasTransaction = false
+    export let hasPincodeForm = false
+
+    $: confirmPincode = null
+    $: transaction = $modalStore.txXDR
+        ? TransactionBuilder.fromXDR($modalStore.txXDR, Networks.TESTNET)
+        : null
+
+    import { page } from '$app/stores'
+    import { getContext } from 'svelte'
+    $: confirmingSubmitting = false
+    console.log('PinModal page', $page)
+
+    // const confirmPincodesMatch = () => {
+    //     console.log('returning', firstPincode === confirmPincode)
+    //     return firstPincode === confirmPincode
+    // }
+
+    const confirm = async () => {
+        confirmingSubmitting = true
+        if (firstPincode) {
+            try {
+                confirmCorrectPincode(firstPincode, confirmPincode, true)
+                $modalStore.confirmingPincode = false
+                close()
+            } catch (err) {
+                $modalStore.errorMessage = err.body.message
+            }
+        } else if (transaction !== null) {
+            try {
+                let signedTransaction = await walletStore.sign(transaction, confirmPincode.toString())
+                await submit(signedTransaction)
+                $modalStore.confirmingPincode = false
+                close()
+            } catch (err) {
+                console.log('transaction sign error', err)
+                $modalStore.errorMessage = err.body.message
+            }
+        }
+        confirmingSubmitting = false
     }
 
-    export let header
-    export let description
-    export let button
-    export const value = $pinInput
+    const reject = () => {
+        console.log('rejecting')
+    }
+
 </script>
 
-<input type="checkbox" id="pincode-modal" class="modal-toggle" />
-<div class="modal">
-    <div class="modal-box">
-        <h3 class="font-bold text-lg">{header}</h3>
-        <p class="py-4">{description}</p>
-        <input
-            type="number"
-            id="pincode-input"
-            class="text-center w-full input input-bordered font-mono tracking-widest"
-            bind:value={$pinInput}
-        />
-        <div class="modal-action">
-            <label for="pincode-modal" class="btn btn-primary">{button}</label>
+<div class="prose">
+    <h1>{title}</h1>
+    {#if $modalStore.errorMessage}
+        <div class="alert alert-error">
+            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            <span>Error: {$modalStore.errorMessage}</span>
         </div>
-    </div>
+    {/if}
+    <p>{body}</p>
+    {#if hasTransaction && transaction !== null}
+    <h2>Transaction Details</h2>
+    <p>Network: <code>{transaction.networkPassphrase}</code></p>
+    <p>Source: <code>{transaction.source}</code></p>
+    {#if transaction.memo}
+        <p>Memo: <code>{transaction.memo.value}</code></p>
+    {/if}
+    <h2>Operations</h2>
+        <ol>
+            {#each transaction.operations as operation, i}
+                <li>Operation {i}</li>
+                <ul>
+                    {#each Object.entries(operation) as [ key, value ]}
+                        <li>{key}: <code>{value}</code></li>
+                    {/each}
+                </ul>
+            {/each}
+        </ol>
+    <pre><code>{$modalStore.txXDR}</code></pre>
+{/if}
+    {#if hasPincodeForm}
+        <div class="form-control">
+            <label for="confirmPincode" class="label">
+                <span class="label-text">Confirm Pincode</span>
+            </label>
+            <input
+                type="number"
+                id="confirmPincode"
+                class="input input-bordered"
+                bind:value={confirmPincode}
+                on:keydown={e => e.key === 'Enter' && confirm()}
+            />
+        </div>
+        <button class='btn btn-primary' on:click={confirm} disabled={confirmingSubmitting}>
+            {#if confirmingSubmitting}<span class="loading loading-spinner loading-sm"></span>{/if}
+            Confirm
+        </button>
+        <button class="btn btn-warning" on:click={reject} disabled={confirmingSubmitting}>Reject</button>
+    {/if}
 </div>
 
-<style>
+
+
+<!-- <style>
     input::-webkit-outer-spin-button,
     input::-webkit-inner-spin-button {
         -webkit-appearance: none;
@@ -41,4 +121,4 @@
     input[type='number'] {
         -moz-appearance: textfield;
     }
-</style>
+</style> -->

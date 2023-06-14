@@ -1,16 +1,21 @@
 <script>
-    // import Modal from '$lib/components/Modal.svelte';
+    export const prerender = true
+
     import '../app.postcss'
-    import { setContext } from 'svelte'
-    import { writable } from 'svelte/store'
 
-    /** @type {import('./$types').LayoutData} */
+
+    import Modal, { bind } from 'svelte-simple-modal'
+    import TxPreviewModal from '$lib/components/TxPreviewModal.svelte';
+    import { modal } from '$lib/stores/modalStore'
+    // const showModal = () => modal.set(bind(TxPreviewModal, { message: "It's a transaction!" }))
     export let data
-
-    const user = writable()
-    $: user.set(data.user)
-
-    setContext('user')
+    // console.log('routes/layout data', data)
 </script>
 
-<slot />
+<Modal
+    show={$modal}
+    classContent="rounded bg-base-200"
+>
+    <slot />
+</Modal>
+

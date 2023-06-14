@@ -1,14 +1,14 @@
 import { browser } from '$app/environment'
 import { storageAvailable } from '$lib/stores/localStore'
+import { walletStore } from '$lib/stores/walletStore'
+import { get } from 'svelte/store'
 
 /** @type {import('./$types').LayoutLoad} */
 export function load() {
     if (browser) {
-        if (storageAvailable('localStorage')) {
-            const bpaPublicKey = JSON.parse(localStorage.getItem('bpa:publicKey'))
-            return {
-                bpaPublicKey,
-            }
+        const { publicKey } = get(walletStore)
+        return {
+            publicKey,
         }
     }
 }

@@ -6,11 +6,11 @@
 
     /** @type {import('./$types').PageData} */
     export let data
-    let bpaPublicKey = data.bpaPublicKey
+    let publicKey = data.publicKey
 </script>
 
 <div class="my-10 mx-20">
-    <AssetStats {bpaPublicKey} />
+    <AssetStats />
 </div>
 
 <div class="my-10 mx-20 grid grid-cols-1 xl:grid-cols-2 gap-10">

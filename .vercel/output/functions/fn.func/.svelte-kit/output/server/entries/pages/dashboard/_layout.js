@@ -1,2 +1,0 @@
-function load() {}
-export { load }

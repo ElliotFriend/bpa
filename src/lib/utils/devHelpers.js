@@ -1,4 +1,4 @@
-import { startTransaction, submitTransaction, fundWithFriendbot } from '$lib/utils/horizonQueries'
+import { startTransaction, submit, fundWithFriendbot } from '$lib/utils/horizonQueries'
 import { Server, Operation, Asset, Keypair } from 'stellar-sdk'
 
 export async function addContactTrustlines(keypair, assets) {

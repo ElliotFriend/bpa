@@ -1,11 +1,9 @@
 <script>
-    // import { page } from '$app/stores';
+    import { page } from '$app/stores';
     import { fetchAccount } from '$lib/utils/horizonQueries'
-    // console.log('assetstats', $page.data.bpaPublicKey)
-    // let balances = fetchAccount($page.data.bpaPublicKey)
-    // console.log(balances)
-    export let bpaPublicKey
-    let accountPromise = fetchAccount(bpaPublicKey)
+
+    let publicKey = $page.data.publicKey
+    let accountPromise = fetchAccount(publicKey)
 </script>
 
 <div class="prose mt-2 mb-1">

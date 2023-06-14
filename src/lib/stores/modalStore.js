@@ -1,8 +1,32 @@
 import { writable } from 'svelte/store'
+import { getContext } from 'svelte'
+// const { open } = getContext('simple-modal')
 
-export let modalStore = writable({
-    title: 'Congratulations random Internet user!',
-    body: "You've been selected for a chance to get one year of subscription to use Wikipedia for free!",
-    button: 'Yay!',
-    txXDR: '',
+export const modalStore = writable({
+    title: 'Transaction Preview',
+    body: 'Please confirm the transaction below in order to sign and submit it to the network',
+    confirmButton: 'Confirm',
+    rejectButton: 'Reject',
+    confirmingPincode: false,
+    txXDR: null,
+    errorMessage: null,
 })
+
+// export const pinModalStore = writable({
+//     title: 'Confirm Pincode',
+//     body: 'Please confirm your pincode',
+//     // firstPincode: null,
+//     // confirmPincode: null,
+// })
+
+export const modal = writable(null)
+
+// export const txPreviewModal = () => {
+//     modal.set
+// }
+
+// export const handleTxPreview = () => {
+//     if ($modalStore.txXDR) {
+//         // parse xdr
+//     }
+// }

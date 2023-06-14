@@ -1,6 +1,6 @@
 <script>
-    // import { page } from "$app/stores";
-    export let bpaPublicKey
+    import { page } from "$app/stores";
+    let publicKey = $page.data.publicKey
 </script>
 
 <header class="navbar bg-base-300">
@@ -10,10 +10,10 @@
     <div class="flex-none">
         <div class="dropdown dropdown-end">
             <button tabindex="0" class="btn btn-ghost btn-circle avatar">
-                {#if bpaPublicKey}
+                {#if publicKey}
                     <div class="w-10 rounded-full">
                         <img
-                            src="https://id.lobstr.co/{bpaPublicKey}.png"
+                            src="https://id.lobstr.co/{publicKey}.png"
                             alt="stellar-account-identicon"
                         />
                     </div>

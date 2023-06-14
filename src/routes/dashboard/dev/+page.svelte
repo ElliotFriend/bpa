@@ -4,13 +4,15 @@
     import { fundWithFriendbot, startTransaction } from '$lib/utils/horizonQueries'
     import { fetchAssets } from '$lib/utils/stellarExpert'
     import { addContactTrustlines, mergeFriendbotAccount } from '$lib/utils/devHelpers'
-    import ModalButton from '$lib/components/ModalButton.svelte'
-    // import { getContext } from 'svelte'
+    // import ModalButton from '$lib/components/ModalButton.svelte'
+    import { getContext } from 'svelte'
     // console.log('getContext', getContext('simple-modal'))
     // import { modalStore } from '$lib/stores/modalStore'
-    // import Modal from 'svelte-simple-modal'
     // const { open, close } = getContext('simple-modal')
     // import SimpleModal from '$lib/components/SimpleModal.svelte'
+    import { modal } from '$lib/stores/modalStore'
+    // const { open } = getContext('simple-modal')
+    import { walletStore } from '$lib/stores/walletStore.js'
 
     export let data
 
@@ -74,12 +76,16 @@
     <button class="btn btn-error" on:click={contacts.empty}>Empty Contacts</button>
     <h2 class="text-3xl font-bold">Get Rich</h2>
     <p>Get your own account funded by friendbot</p>
-    <button class="btn btn-success" on:click={mergeFriendbotAccount(data.bpaPublicKey)}
+    <button class="btn btn-success" on:click={mergeFriendbotAccount($walletStore.publicKey)}
         >I need a friend!</button
     >
     <h2 class="text-3xl font-bold">Launch Modal Rocket</h2>
     <p>Test the modal thing to see what comes up... I guess?</p>
     <input type="text" bind:value={modalButtonText} />
+    <!-- <Modal show={$modal}> -->
+    <button on:click={open}
+        class="btn btn-primary">{modalButtonText}</button>
+    <!-- </Modal> -->
     <!-- <label for="my-modal" class="btn btn-primary">open modal</label> -->
-    <ModalButton buttonText={modalButtonText} />
+    <!-- <ModalButton buttonText={modalButtonText} /> -->
 </div>

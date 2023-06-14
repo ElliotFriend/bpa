@@ -4,7 +4,7 @@ import { page } from '$app/stores'
 // console.log('pagejsPage',)
 
 /** @type {import('./$types').PageLoad} */
-export async function load({ fetch, parent }) {
+export async function load({ fetch }) {
     const network = 'testnet'
     const baseUrl = `https://api.stellar.expert/explorer/${network}/`
 

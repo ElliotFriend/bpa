@@ -1,24 +1,78 @@
 <script>
-    import { getAccountBalances } from '$lib/utils/horizonQueries'
+    import { Asset, Operation } from 'stellar-sdk'
+    import { getAccountBalances, startTransaction } from '$lib/utils/horizonQueries'
+    import { modalStore } from '$lib/stores/modalStore'
+    import PinModal from '$lib/components/PinModal.svelte';
     import { enhance } from '$app/forms'
+    import { getContext } from 'svelte'
+    const { open } = getContext('simple-modal')
 
+    /** @type {import('./$types').PageData} */
     export let data
-    let balancesPromise = getAccountBalances(data.bpaPublicKey)
+    // let addAsset
+    let balancesPromise = getAccountBalances(data.publicKey)
+    $: errorMessage = null
+    $: addAsset = null
+
+    const previewTransaction = async (adding = true, removeAsset = null) => {
+        let transaction = await startTransaction(data.publicKey)
+        let asset = adding && addAsset && !removeAsset ? addAsset : removeAsset
+        const assetObj = new Asset(asset.split('-')[0], asset.split('-')[1])
+
+        if (adding) {
+            transaction.addOperation(
+                Operation.changeTrust({
+                    asset: assetObj
+                })
+            )
+        } else {
+            transaction.addOperation(
+                Operation.changeTrust({
+                    asset: assetObj,
+                    limit: '0'
+                })
+            )
+        }
+
+        transaction = transaction.setTimeout(300).build()
+        $modalStore.txXDR = transaction.toXDR()
+        open(PinModal,
+            {
+                hasPincodeForm: true,
+                hasTransaction: true,
+            }, { },
+            {
+                onOpen: () => {
+                    $modalStore.errorMessage = null
+                },
+                onOpened: () => {
+                    $modalStore.confirmingPincode = true
+                },
+                onClose: () => {
+                    if ($modalStore.errorMessage) {
+                        errorMessage = null
+                    } else if (!$modalStore.confirmingPincode) {
+                        errorMessage = null
+                    }
+                },
+            }
+        )
+    }
 </script>
 
 <div class="my-10 mx-20">
     <h1 class="text-5xl font-bold">Assets</h1>
     <h2 class="text-3xl font-bold">Add Trusted Assets</h2>
-    <form method="POST" action="?/preview" use:enhance>
-        <input type="hidden" id="source" name="source" value={data.bpaPublicKey} />
-        <input type="hidden" id="addAsset" name="assAsset" value={true} />
+    <form on:submit|preventDefault={previewTransaction}>
+        <!-- <input type="hidden" id="source" name="source" value={data.bpaPublicKey} /> -->
+        <!-- <input type="hidden" id="addAsset" name="addAsset" value={true} /> -->
         <label for="asset" class="label">
             <span class="label-text">Asset</span>
         </label>
-        <select id="asset" name="asset" class="select select-bordered w-full max-w-xs">
+        <select id="asset" name="asset" class="select select-bordered w-full max-w-xs" bind:value={addAsset}>
             <option disabled selected>Select Asset</option>
-            {#each data.assets as asset}
-                <option value={asset.asset}>{asset.asset.slice()}</option>
+            {#each data.assets as { asset }}
+                <option value={asset}>{asset.slice()}</option>
             {/each}
         </select>
         <button class="btn btn-primary">Add Asset</button>
@@ -54,8 +108,8 @@
                             <td>{balance.limit ?? 'n/a'}</td>
                             <th>
                                 {#if balance.asset_type !== 'native'}
-                                    <form method="POST" action="?/preview" use:enhance>
-                                        <input
+                                    <form on:submit|preventDefault={() => previewTransaction(false, `${balance.asset_code}-${balance.asset_issuer}`)}>
+                                        <!-- <input
                                             type="hidden"
                                             name="source"
                                             id="source"
@@ -66,8 +120,8 @@
                                             name="asset"
                                             id="asset"
                                             value={`${balance.asset_code}-${balance.asset_issuer}`}
-                                        />
-                                        <button class="btn btn-square btn-error">
+                                        /> -->
+                                        <button type="submit" class="btn btn-square btn-error">
                                             <svg
                                                 xmlns="http://www.w3.org/2000/svg"
                                                 viewBox="0 0 20 20"

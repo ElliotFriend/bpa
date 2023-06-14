@@ -120,7 +120,7 @@
     </div>
 {/if}
 
-<form>
+<form on:submit|preventDefault={previewTransaction}>
     <input type="hidden" id="source" name="source" value={sourcePublicKey} />
     <div class="form-control w-full max-w-xs">
         <label for="destination" class="label">
@@ -217,6 +217,6 @@
             txXDR={txXDR}
             source={sourcePublicKey}
         /> -->
-        <button type="submit" class="btn btn-primary" on:click={previewTransaction}>Preview</button>
+        <button type="submit" class="btn btn-primary">Preview</button>
     </div>
 </form>

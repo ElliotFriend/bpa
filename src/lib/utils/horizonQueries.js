@@ -12,12 +12,12 @@ export async function fetchAccount(publicKey) {
             funded: true
         }
     } catch (err) {
-        if (err.response.status === 404) {
+        if (err.response?.status === 404) {
             return {
                 funded: false,
             }
         } else {
-            throw error(err.response.status, `${err.response.title} - ${err.response.detail}`)
+            throw error(err.response?.status ?? 400, `${err.response?.title} - ${err.response?.detail}`)
         }
     }
 
@@ -71,10 +71,8 @@ export async function submit(transaction) {
 }
 
 export async function getAccountBalances(publicKey) {
-    const { account } = await fetchAccount(publicKey)
-    return {
-        balances: account.balances,
-    }
+    const { account: { balances } } = await fetchAccount(publicKey)
+    return balances
 }
 
 export async function fundWithFriendbot(publicKey) {
@@ -82,4 +80,28 @@ export async function fundWithFriendbot(publicKey) {
         const friendbotUrl = `https://friendbot.stellar.org?addr=${publicKey}`
         await fetch(friendbotUrl)
     }
+}
+
+export async function fetchRecentPayments(publicKey, limit = 10) {
+    let res = await server.payments().forAccount(publicKey).limit(limit).order('desc').call()
+    // console.log('fetch in horizonQueries', res.records)
+    return res.records
+}
+
+export async function getBalanceHomeDomains(balances) {
+    let homeDomains = await Promise.all(
+        balances.map(async (asset) => {
+            if (asset.asset_type !== 'native') {
+                let { account } = await fetchAccount(asset.asset_issuer)
+                if (account.home_domain) {
+                    return {
+                        ...asset,
+                        home_domain: account.home_domain
+                    }
+                }
+            }
+        })
+    )
+
+    return homeDomains.filter(balance => balance)
 }

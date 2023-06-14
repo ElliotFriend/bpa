@@ -3,26 +3,29 @@
     import { goto } from '$app/navigation'
     import { modalStore } from '$lib/stores/modalStore'
     import { walletStore, confirmCorrectPincode } from '$lib/stores/walletStore'
+    import { webAuthStore } from '$lib/stores/webAuthStore'
     import { TransactionBuilder, Networks } from 'stellar-sdk'
     import { submit } from '$lib/utils/horizonQueries'
+    import { submitChallengeTransaction } from '$lib/utils/sep10'
 
     const { close } = getContext('simple-modal')
 
     export let title = 'Transaction Preview'
     export let body = 'Please confirm the transaction below in order to sign and submit it to the network'
     export let firstPincode
-    export let hasTransaction = false
+    export let realTransaction = false
+    export let challengeTransaction = false
     export let hasPincodeForm = false
 
     $: confirmPincode = null
     $: transaction = $modalStore.txXDR
-        ? TransactionBuilder.fromXDR($modalStore.txXDR, Networks.TESTNET)
+        ? TransactionBuilder.fromXDR($modalStore.txXDR, $modalStore.challengeNetwork || Networks.TESTNET)
         : null
 
     import { page } from '$app/stores'
     import { getContext } from 'svelte'
     $: confirmingSubmitting = false
-    console.log('PinModal page', $page)
+    // console.log('PinModal page', $page)
 
     // const confirmPincodesMatch = () => {
     //     console.log('returning', firstPincode === confirmPincode)
@@ -39,6 +42,18 @@
             } catch (err) {
                 $modalStore.errorMessage = err.body.message
             }
+        } else if (challengeTransaction) {
+            try {
+                let signedTransaction = await walletStore.sign(transaction, confirmPincode.toString())
+                let token = await submitChallengeTransaction(signedTransaction)
+                webAuthStore.set({ token })
+                $modalStore.confirmPincode = false
+                close()
+            } catch (err) {
+                console.log('challenge transaction', err)
+                $modalStore.errorMessage = err.body.message
+            }
+
         } else if (transaction !== null) {
             try {
                 let signedTransaction = await walletStore.sign(transaction, confirmPincode.toString())
@@ -68,7 +83,7 @@
         </div>
     {/if}
     <p>{body}</p>
-    {#if hasTransaction && transaction !== null}
+    {#if transaction !== null}
     <h2>Transaction Details</h2>
     <p>Network: <code>{transaction.networkPassphrase}</code></p>
     <p>Source: <code>{transaction.source}</code></p>
@@ -87,7 +102,7 @@
             {/each}
         </ol>
     <pre><code>{$modalStore.txXDR}</code></pre>
-{/if}
+    {/if}
     {#if hasPincodeForm}
         <div class="form-control">
             <label for="confirmPincode" class="label">

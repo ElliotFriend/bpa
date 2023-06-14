@@ -19,9 +19,9 @@ export async function load({ fetch }) {
                 cursor: 0,
             })}`
         )
-        let json = await assetRes.json()
-        // const assets = fetchAssets()
-        return json._embedded.records
+        let assetJson = await assetRes.json()
+
+        return assetJson._embedded.records
     }
 
     return {

@@ -9,6 +9,7 @@
 
     /** @type {import('./$types').PageData} */
     export let data
+    // console.log('routes/assets/+page.svelte data', data)
     // let addAsset
     let balancesPromise = getAccountBalances(data.publicKey)
     $: errorMessage = null
@@ -39,7 +40,7 @@
         open(PinModal,
             {
                 hasPincodeForm: true,
-                hasTransaction: true,
+                realTransaction: true,
             }, { },
             {
                 onOpen: () => {
@@ -51,10 +52,11 @@
                 onClose: () => {
                     if ($modalStore.errorMessage) {
                         errorMessage = null
-                    } else if (!$modalStore.confirmingPincode) {
-                        errorMessage = null
                     }
                 },
+                onClosed: () => {
+                    $modalStore.txXDR = null
+                }
             }
         )
     }
@@ -70,17 +72,19 @@
             <span class="label-text">Asset</span>
         </label>
         <select id="asset" name="asset" class="select select-bordered w-full max-w-xs" bind:value={addAsset}>
-            <option disabled selected>Select Asset</option>
+            <option disabled value={null} selected>Select Asset</option>
             {#each data.assets as { asset }}
                 <option value={asset}>{asset.slice()}</option>
             {/each}
+            <option value="SRT-GCDNJUBQSX7AJWLJACMJ7I4BC3Z47BQUTMHEICZLE6MU4KQBRYG5JY6B">testanchor SRT-GCDNJUBQSX7AJWLJACMJ7I4BC3Z47BQUTMHEICZLE6MU4KQBRYG5JY6B</option>
+            <option value="USDC-GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5">testanchor USDC-GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5</option>
         </select>
         <button class="btn btn-primary">Add Asset</button>
     </form>
     <h2 class="text-3xl font-bold">Existing Balances</h2>
     {#await balancesPromise}
         <p>loading...</p>
-    {:then { balances }}
+    {:then balances}
         <div class="overflow-x-auto">
             <table class="table w-full">
                 <thead>

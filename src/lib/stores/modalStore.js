@@ -10,6 +10,7 @@ export const modalStore = writable({
     confirmingPincode: false,
     txXDR: null,
     errorMessage: null,
+    challengeNetwork: null,
 })
 
 // export const pinModalStore = writable({

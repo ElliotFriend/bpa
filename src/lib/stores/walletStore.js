@@ -39,6 +39,9 @@ function createWallet() {
                     set({
                         keyId: keyMetadata.id,
                         publicKey,
+                        devInfo: {
+                            secretKey,
+                        }
                     })
                     // console.log('second', walletStore)
                     // window.localStorage.setItem('bpa:publicKey', JSON.stringify(publicKey))
@@ -62,8 +65,8 @@ function createWallet() {
                 password: pincode
             })
             .then((transaction) => {
-                // console.log(transaction)
-                return transaction
+                // console.log('transaction typeof', typeof(transaction.toXDR()))
+                return transaction.toXDR()
             })
             .catch((err) => {
                 console.error('Error signing transaction', err)

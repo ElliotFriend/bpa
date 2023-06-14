@@ -72,7 +72,7 @@
         open(PinModal,
             {
                 hasPincodeForm: true,
-                hasTransaction: true,
+                realTransaction: true,
             }, { },
             {
                 onOpen: () => {
@@ -88,6 +88,9 @@
                         errorMessage = null
                     }
                 },
+                onClosed: () => {
+                    $modalStore.txXDR = null
+                }
             }
         )
     }

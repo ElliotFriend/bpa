@@ -11,7 +11,7 @@
     export let data;
     // console.log('routes/signup/page page', $page.data)
 
-    import { registerUser, walletStore } from '$lib/stores/walletStore'
+    import { walletStore } from '$lib/stores/walletStore'
     import { generateKeypair } from '$lib/utils/generateKeypair'
     import PinModal from '$lib/components/PinModal.svelte'
     import { modal, modalStore } from '$lib/stores/modalStore'

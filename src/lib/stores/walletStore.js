@@ -58,7 +58,7 @@ function createWallet() {
 
         sign: (transaction, pincode) => {
             const keyManager = setupKeyManager()
-            console.log(walletStore)
+            // console.log(walletStore)
             let signedTransaction = keyManager.signTransaction({
                 transaction,
                 id: get(walletStore).keyId,

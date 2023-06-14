@@ -5,6 +5,8 @@
     // console.log('routes/transfer/+page.svelte data', data)
 
     import { getBalanceHomeDomains, getAccountBalances } from '$lib/utils/horizonQueries'
+    import { initiateTransfer } from '$lib/utils/sep24'
+    import { webAuthStore } from '$lib/stores/webAuthStore'
     let homeDomainPromise = async () => {
         let balances = await getAccountBalances(data.publicKey)
         return getBalanceHomeDomains(balances)
@@ -15,7 +17,13 @@
     import { getContext } from 'svelte'
     const { open } = getContext('simple-modal')
     import { getChallengeTransaction, validateChallengeTransaction } from '$lib/utils/sep10'
-    import { prevent_default } from 'svelte/internal'
+
+    const transfer = async (direction, homeDomain = 'testanchor.stellar.org') => {
+        let interactive = await initiateTransfer($webAuthStore.token, direction, homeDomain)
+        console.log('interactive deposit response', interactive)
+        window.open(interactive.url, 'chromeWindow', 'popup')
+    }
+
     const auth = async (homeDomain = 'testanchor.stellar.org') => {
         let { transaction, network_passphrase } = await getChallengeTransaction(data.publicKey, homeDomain)
         $modalStore.txXDR = transaction
@@ -57,8 +65,12 @@
     {:then homeDomains}
         {#each homeDomains as asset}
             {asset.asset_code} <small>{asset.home_domain}</small>
-            <button class="btn">SEP-24 Deposit</button>
-            <button class="btn">SEP-24 Withdraw</button>
+            <form on:submit|preventDefault={() => transfer('deposit', asset.home_domain)}>
+                <button class="btn">SEP-24 Deposit</button>
+            </form>
+            <form on:submit|preventDefault={() => transfer('withdraw', asset.home_domain)}>
+                <button class="btn">SEP-24 Withdraw</button>
+            </form>
             <form on:submit|preventDefault={() => auth(asset.home_domain)}>
                 <button class="btn" type="submit">Authenticate</button>
             </form>

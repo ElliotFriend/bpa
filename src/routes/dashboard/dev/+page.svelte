@@ -4,6 +4,7 @@
     import { fundWithFriendbot, startTransaction } from '$lib/utils/horizonQueries'
     import { fetchAssets } from '$lib/utils/stellarExpert'
     import { addContactTrustlines, mergeFriendbotAccount } from '$lib/utils/devHelpers'
+    import { browser } from '$app/environment'
     // import ModalButton from '$lib/components/ModalButton.svelte'
     import { getContext } from 'svelte'
     // console.log('getContext', getContext('simple-modal'))
@@ -45,8 +46,18 @@
     }
 </script>
 
-<div class="my-10 mx-20">
+<div class="prose my-10 mx-20">
     <h1 class="text-5xl font-bold">Dev Helpers</h1>
+    {#if browser}
+        <h2 class="text-3xl font-bold">Keypair Information</h2>
+        <p>These can be helpful to know in case you need to manually create some transactions that we aren't setup to do yet.</p>
+        <dl>
+            <dt><strong>Public Key</strong></dt>
+            <dd><code>{$walletStore.publicKey}</code></dd>
+            <dt><strong>Secret Key</strong></dt>
+            <dd><code>{$walletStore.devInfo.secretKey}</code></dd>
+        </dl>
+    {/if}
     <h2 class="text-3xl font-bold">Make Friends</h2>
     <p>Populate the contact list, and fund the accounts with friendbot</p>
     <input type="number" id="numContacts" name="numContacts" bind:value={numContacts} />

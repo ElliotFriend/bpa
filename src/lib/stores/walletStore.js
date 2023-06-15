@@ -39,6 +39,8 @@ function createWallet() {
                     set({
                         keyId: keyMetadata.id,
                         publicKey,
+                        // remove this before publishing, it's just to make the secret key accessible
+                        // in case we need to do some manual transactions or something.
                         devInfo: {
                             secretKey,
                         }
@@ -66,7 +68,7 @@ function createWallet() {
             })
             .then((transaction) => {
                 // console.log('transaction typeof', typeof(transaction.toXDR()))
-                return transaction.toXDR()
+                return transaction
             })
             .catch((err) => {
                 console.error('Error signing transaction', err)

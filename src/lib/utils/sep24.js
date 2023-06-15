@@ -2,7 +2,7 @@ import { StellarTomlResolver } from "stellar-sdk";
 import { get } from 'svelte/store'
 import { webAuthStore } from '$lib/stores/webAuthStore'
 
-export async function initiateTransfer(token, direction, homeDomain = 'testanchor.stellar.org') {
+export async function initiateTransfer(authToken, direction, homeDomain = 'testanchor.stellar.org') {
     let { TRANSFER_SERVER_SEP0024 } = await StellarTomlResolver.resolve(homeDomain)
     // let token = get(webAuthStore).token
 
@@ -11,7 +11,7 @@ export async function initiateTransfer(token, direction, homeDomain = 'testancho
         mode: 'cors',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
+            'Authorization': `Bearer ${authToken}`,
         },
         body: JSON.stringify({
             'asset_code': 'SRT'

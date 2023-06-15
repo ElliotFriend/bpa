@@ -1,6 +1,4 @@
 import { writable } from 'svelte/store'
-import { getContext } from 'svelte'
-// const { open } = getContext('simple-modal')
 
 export const modalStore = writable({
     title: 'Transaction Preview',

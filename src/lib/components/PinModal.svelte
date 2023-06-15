@@ -7,6 +7,7 @@
     import { TransactionBuilder, Networks } from 'stellar-sdk'
     import { submit } from '$lib/utils/horizonQueries'
     import { submitChallengeTransaction } from '$lib/utils/sep10'
+    import ErrorAlert from '$lib/components/ErrorAlert.svelte'
 
     const { close } = getContext('simple-modal')
 
@@ -34,42 +35,34 @@
 
     const confirm = async () => {
         confirmingSubmitting = true
-        if (firstPincode) {
-            try {
+        try {
+            if (firstPincode) {
                 confirmCorrectPincode(firstPincode, confirmPincode, true)
                 $modalStore.confirmingPincode = false
                 close()
-            } catch (err) {
-                $modalStore.errorMessage = err.body.message
-            }
-        } else if (challengeTransaction) {
-            try {
+            } else if (challengeTransaction) {
                 let signedTransaction = await walletStore.sign(transaction, confirmPincode.toString())
-                let token = await submitChallengeTransaction(signedTransaction)
+                let token = await submitChallengeTransaction(signedTransaction.toXDR())
                 webAuthStore.set({ token })
                 $modalStore.confirmPincode = false
                 close()
-            } catch (err) {
-                console.log('challenge transaction', err)
-                $modalStore.errorMessage = err.body.message
-            }
-
-        } else if (transaction !== null) {
-            try {
+            } else if (realTransaction && transaction !== null) {
                 let signedTransaction = await walletStore.sign(transaction, confirmPincode.toString())
                 await submit(signedTransaction)
                 $modalStore.confirmingPincode = false
                 close()
-            } catch (err) {
-                console.log('transaction sign error', err)
-                $modalStore.errorMessage = err.body.message
             }
+        } catch (err) {
+            console.error('transaction confirmation error', err)
+            $modalStore.errorMessage = err.body.message
         }
         confirmingSubmitting = false
     }
 
     const reject = () => {
-        console.log('rejecting')
+        console.error('pincode confirmation rejected for transaction', $modalStore.txXDR)
+        $modalStore.errorMessage = 'pincode confirmation rejected'
+        close()
     }
 
 </script>
@@ -77,10 +70,7 @@
 <div class="prose">
     <h1>{title}</h1>
     {#if $modalStore.errorMessage}
-        <div class="alert alert-error">
-            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-            <span>Error: {$modalStore.errorMessage}</span>
-        </div>
+        <ErrorAlert errorMessage={$modalStore.errorMessage} />
     {/if}
     <p>{body}</p>
     {#if transaction !== null}

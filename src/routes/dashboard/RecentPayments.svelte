@@ -2,6 +2,7 @@
     import { page } from '$app/stores';
     import { fetchRecentPayments } from '$lib/utils/horizonQueries'
     import { contacts } from '$lib/stores/contactsStore'
+    import TruncatedPublicKey from '$lib/components/TruncatedPublicKey.svelte';
     let publicKey = $page.data.publicKey
     let paymentsPromise = fetchRecentPayments(publicKey)
     // console.log('payments in RecentPayments', payments)
@@ -12,31 +13,35 @@
         <h3>Recent Payments</h3>
     </div>
     {#await paymentsPromise}
-        <p>loading...</p>
+        <p>Loading payments history...</p>
     {:then payments}
-        <table class="table w-full">
+        <table class="table">
             <!-- head -->
             <thead>
                 <tr>
                     <th>Amount</th>
                     <th>Asset</th>
-                    <th>Type</th>
                     <th>Direction</th>
-                    <th>Contact</th>
+                    <th>Address</th>
                 </tr>
             </thead>
             <tbody>
                 {#each payments as payment}
                     <tr>
-                        <th>{payment.amount || payment.starting_balance}</th>
+                        <th>
+                            {#if payment.amount}
+                                {parseFloat(payment.amount).toFixed(2)}
+                            {:else if payment.starting_balance}
+                                {parseFloat(payment.starting_balance).toFixed(2)}
+                            {/if}
+                        </th>
                         <td>
                             {#if payment.type === 'create_account' || payment.asset_type === 'native'}
                                 XLM
                             {:else}
-                                {payment.asset_type}
+                                {payment.asset_code}
                             {/if}
                         </td>
-                        <td>{payment.type}</td>
                         <td>
                             {#if payment.to === publicKey || ('funder' in payment && payment.funder !== publicKey)}
                                 Received
@@ -47,15 +52,15 @@
                         <td>
                             {#if 'to' in payment}
                                 {#if payment.to === publicKey}
-                                    {payment.from}
+                                    <TruncatedPublicKey publicKey={payment.from} />
                                 {:else}
-                                    {payment.to}
+                                    <TruncatedPublicKey publicKey={payment.to} />
                                 {/if}
                             {:else if 'funder' in payment}
                                 {#if payment.funder === publicKey}
-                                    {payment.account}
+                                    <TruncatedPublicKey publicKey={payment.account} />
                                 {:else}
-                                    {payment.funder}
+                                    <TruncatedPublicKey publicKey={payment.funder} />
                                 {/if}
                             {/if}
                         </td>

@@ -1,5 +1,6 @@
 <script>
     import { contacts } from '$lib/stores/contactsStore'
+    import TruncatedPublicKey from '$lib/components/TruncatedPublicKey.svelte';
 
     // console.log($contacts)
     $: favoriteContacts = $contacts?.filter((contact) => contact.favorite)
@@ -49,7 +50,7 @@
                                 </div>
                             </div>
                         </td>
-                        <td>{contact.address}</td>
+                        <td><TruncatedPublicKey publicKey={contact.address} /></td>
                         <th>
                             <button class="btn btn-ghost btn-xs">Stellar.Expert</button>
                         </th>

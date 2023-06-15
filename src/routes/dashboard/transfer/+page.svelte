@@ -2,26 +2,82 @@
     /** @type {import('./$types').PageData} */
     export let data
     $: errorMessage = null
-    // console.log('routes/transfer/+page.svelte data', data)
 
-    import { getBalanceHomeDomains, getAccountBalances } from '$lib/utils/horizonQueries'
+    import { Buffer } from 'buffer'
+    // console.log('routes/transfer/+page.svelte data', data)
+    // let receivedMemo = "AAAAAAAAAAAAAAAAAAAAAAyHvUNuIEhUtJyZQ0sGgKQ="
+    // console.log('does buffer work now?', Buffer.from(receivedMemo, 'base64').toString('hex'))
+
+    import { getBalanceHomeDomains, getAccountBalances, startTransaction } from '$lib/utils/horizonQueries'
+    import { getSep10Domains } from '$lib/utils/sep10'
     import { initiateTransfer } from '$lib/utils/sep24'
     import { webAuthStore } from '$lib/stores/webAuthStore'
+    import { transfers } from '$lib/stores/transfersStore'
+
     let homeDomainPromise = async () => {
         let balances = await getAccountBalances(data.publicKey)
-        return getBalanceHomeDomains(balances)
+        let balancesWithHomeDomains = await getBalanceHomeDomains(balances)
+        return getSep10Domains(balancesWithHomeDomains)
     }
 
     import { modalStore } from '$lib/stores/modalStore'
+    // import { walletStore } from '$lib/stores/walletStore'
     import PinModal from '$lib/components/PinModal.svelte';
     import { getContext } from 'svelte'
     const { open } = getContext('simple-modal')
     import { getChallengeTransaction, validateChallengeTransaction } from '$lib/utils/sep10'
+    import ErrorAlert from '$lib/components/ErrorAlert.svelte'
+    import { TransactionBuilder, Networks, Asset, Memo, Operation, xdr } from 'stellar-sdk'
 
     const transfer = async (direction, homeDomain = 'testanchor.stellar.org') => {
-        let interactive = await initiateTransfer($webAuthStore.token, direction, homeDomain)
-        console.log('interactive deposit response', interactive)
-        window.open(interactive.url, 'chromeWindow', 'popup')
+        let { id, type, url } = await initiateTransfer($webAuthStore.token, direction, homeDomain)
+        console.log('interactive transfer response', { id, type, url })
+        let interactiveUrl = `${url}&callback=postMessage`
+        let popup = window.open(interactiveUrl, 'bpaTransferWindow', 'popup')
+        transfers.add(homeDomain, { id, type, url })
+        window.addEventListener(
+            "message",
+            async (event) => {
+                console.log('here is the event i heard', event)
+                let transaction = await startTransaction(data.publicKey)
+                transaction = transaction
+                    .addMemo(Memo.hash(Buffer.from(event.data.transaction.withdraw_memo, 'base64').toString('hex')))
+                    .addOperation(Operation.payment({
+                        destination: event.data.transaction.withdraw_anchor_account,
+                        amount: event.data.transaction.amount_in,
+                        asset: new Asset('SRT', 'GCDNJUBQSX7AJWLJACMJ7I4BC3Z47BQUTMHEICZLE6MU4KQBRYG5JY6B')
+                    }))
+                    .setTimeout(300)
+                    .build()
+                console.log(transaction)
+                $modalStore.txXDR = transaction.toXDR()
+                open(PinModal,
+                    {
+                        hasPincodeForm: true,
+                        realTransaction: true,
+                    }, { },
+                    {
+                        onOpen: () => {
+                            $modalStore.errorMessage = null
+                        },
+                        onOpened: () => {
+                            $modalStore.confirmingPincode = true
+                        },
+                        onClose: () => {
+                            if ($modalStore.errorMessage) {
+                                errorMessage = null
+                            } else if (!$modalStore.confirmingPincode) {
+                                errorMessage = null
+                            }
+                        },
+                        onClosed: () => {
+                            $modalStore.txXDR = null
+                        }
+                    }
+                )
+            },
+            false
+        )
     }
 
     const auth = async (homeDomain = 'testanchor.stellar.org') => {
@@ -44,12 +100,15 @@
                     $modalStore.confirmingPincode = true
                 },
                 onClose: () => {
+                    console.log('closing, here is the current error message', $modalStore.errorMessage)
                     if ($modalStore.errorMessage) {
-                        errorMessage = null
-                    } else if (!$modalStore.confirmingPincode) {
-                        errorMessage = null
+                        errorMessage = $modalStore.errorMessage
                     }
                 },
+                onClosed: () => {
+                    $modalStore.txXDR = null
+                    $modalStore.challengeNetwork = null
+                }
             }
         )
     }
@@ -57,6 +116,9 @@
 
 <div class="my-10 mx-20 prose">
     <h1>Transfers</h1>
+    {#if errorMessage}
+        <ErrorAlert errorMessage={errorMessage} />
+    {/if}
     <h2>Initiate a Transfer</h2>
     <p>Below, are listed all of your trusted assets with the required infrastructure to facilitate deposit and/or withdrawals.</p>
 

@@ -6,6 +6,21 @@ export async function fetchStellarToml(homeDomain = 'testanchor.stellar.org') {
     return StellarTomlResolver.resolve(homeDomain)
 }
 
+export async function getSep10Domains(balances) {
+    let sep10Domains = await Promise.all(
+        balances.map(async (asset) => {
+            let stellarToml = await fetchStellarToml(asset.home_domain)
+            if ('WEB_AUTH_ENDPOINT' in stellarToml) {
+                return {
+                    ...asset
+                }
+            }
+        })
+    )
+
+    return sep10Domains.filter(balance => balance)
+}
+
 export async function getChallengeTransaction(publicKey, homeDomain = 'testanchor.stellar.org') {
     let { WEB_AUTH_ENDPOINT } = await fetchStellarToml(homeDomain)
     let res = await fetch(

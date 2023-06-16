@@ -8,3 +8,7 @@ export function generateKeypair() {
 export function validPublicKey(publicKey) {
     return StrKey.isValidEd25519PublicKey(publicKey)
 }
+
+export function shortenPublicKey(publicKey) {
+
+}

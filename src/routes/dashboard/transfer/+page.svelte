@@ -3,7 +3,7 @@
     export let data
     $: errorMessage = null
 
-    import { Buffer } from 'buffer'
+    // import { Buffer } from 'buffer'
     // console.log('routes/transfer/+page.svelte data', data)
     // let receivedMemo = "AAAAAAAAAAAAAAAAAAAAAAyHvUNuIEhUtJyZQ0sGgKQ="
     // console.log('does buffer work now?', Buffer.from(receivedMemo, 'base64').toString('hex'))

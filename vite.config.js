@@ -2,15 +2,12 @@ import { sveltekit } from '@sveltejs/kit/vite'
 import { defineConfig } from 'vite'
 
 import { NodeGlobalsPolyfillPlugin } from '@esbuild-plugins/node-globals-polyfill'
-import rollupNodePolyFill from 'rollup-plugin-node-polyfills'
+// import rollupNodePolyFill from 'rollup-plugin-node-polyfills'
+import inject from '@rollup/plugin-inject'
+import path from 'path'
 
 export default defineConfig({
     plugins: [sveltekit()],
-    resolve: {
-        alias: {
-            buffer: 'rollup-plugin-node-polyfills/polyfills/buffer-es6',
-        },
-    },
     optimizeDeps: {
         esbuildOptions: {
             define: {
@@ -26,7 +23,9 @@ export default defineConfig({
     build: {
         rollupOptions: {
             plugins: [
-                rollupNodePolyFill(),
+                inject({
+                    window: path.resolve('src/lib/window.js')
+                }),
             ],
         },
     },

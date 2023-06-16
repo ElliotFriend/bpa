@@ -1,6 +1,4 @@
 <script>
-    import { error } from '@sveltejs/kit'
-    import { goto } from '$app/navigation'
     import { modalStore } from '$lib/stores/modalStore'
     import { walletStore, confirmCorrectPincode } from '$lib/stores/walletStore'
     import { webAuthStore } from '$lib/stores/webAuthStore'
@@ -18,20 +16,13 @@
     export let challengeTransaction = false
     export let hasPincodeForm = false
 
-    $: confirmPincode = null
+    let confirmPincode = null
     $: transaction = $modalStore.txXDR
         ? TransactionBuilder.fromXDR($modalStore.txXDR, $modalStore.challengeNetwork || Networks.TESTNET)
         : null
 
-    import { page } from '$app/stores'
     import { getContext } from 'svelte'
-    $: confirmingSubmitting = false
-    // console.log('PinModal page', $page)
-
-    // const confirmPincodesMatch = () => {
-    //     console.log('returning', firstPincode === confirmPincode)
-    //     return firstPincode === confirmPincode
-    // }
+    let confirmingSubmitting = false
 
     const confirm = async () => {
         confirmingSubmitting = true
@@ -113,17 +104,3 @@
         <button class="btn btn-warning" on:click={reject} disabled={confirmingSubmitting}>Reject</button>
     {/if}
 </div>
-
-
-
-<!-- <style>
-    input::-webkit-outer-spin-button,
-    input::-webkit-inner-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-    }
-
-    input[type='number'] {
-        -moz-appearance: textfield;
-    }
-</style> -->

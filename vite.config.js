@@ -19,6 +19,7 @@ export default defineConfig({
                 }),
             ],
         },
+        include: ['@stellar/wallet-sdk', '@albedo-link/intent']
     },
     build: {
         rollupOptions: {
@@ -26,7 +27,7 @@ export default defineConfig({
                 inject({
                     window: path.resolve('src/lib/window.js')
                 }),
-            ],
+            ]
         },
     },
     ssr: {

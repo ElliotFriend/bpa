@@ -66,18 +66,16 @@
     <h1 class="text-5xl font-bold">Assets</h1>
     <h2 class="text-3xl font-bold">Add Trusted Assets</h2>
     <form on:submit|preventDefault={previewTransaction}>
-        <!-- <input type="hidden" id="source" name="source" value={data.bpaPublicKey} /> -->
-        <!-- <input type="hidden" id="addAsset" name="addAsset" value={true} /> -->
         <label for="asset" class="label">
             <span class="label-text">Asset</span>
         </label>
         <select id="asset" name="asset" class="select select-bordered w-full max-w-xs" bind:value={addAsset}>
             <option disabled value={null} selected>Select Asset</option>
+            <option value="SRT-GCDNJUBQSX7AJWLJACMJ7I4BC3Z47BQUTMHEICZLE6MU4KQBRYG5JY6B">testanchor SRT-GCDNJUBQSX7AJWLJACMJ7I4BC3Z47BQUTMHEICZLE6MU4KQBRYG5JY6B</option>
+            <option value="USDC-GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5">testanchor USDC-GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5</option>
             {#each data.assets as { asset }}
                 <option value={asset}>{asset.slice()}</option>
             {/each}
-            <option value="SRT-GCDNJUBQSX7AJWLJACMJ7I4BC3Z47BQUTMHEICZLE6MU4KQBRYG5JY6B">testanchor SRT-GCDNJUBQSX7AJWLJACMJ7I4BC3Z47BQUTMHEICZLE6MU4KQBRYG5JY6B</option>
-            <option value="USDC-GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5">testanchor USDC-GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5</option>
         </select>
         <button class="btn btn-primary">Add Asset</button>
     </form>
@@ -113,18 +111,6 @@
                             <th>
                                 {#if balance.asset_type !== 'native'}
                                     <form on:submit|preventDefault={() => previewTransaction(false, `${balance.asset_code}-${balance.asset_issuer}`)}>
-                                        <!-- <input
-                                            type="hidden"
-                                            name="source"
-                                            id="source"
-                                            value={data.bpaPublicKey}
-                                        />
-                                        <input
-                                            type="hidden"
-                                            name="asset"
-                                            id="asset"
-                                            value={`${balance.asset_code}-${balance.asset_issuer}`}
-                                        /> -->
                                         <button type="submit" class="btn btn-square btn-error">
                                             <svg
                                                 xmlns="http://www.w3.org/2000/svg"

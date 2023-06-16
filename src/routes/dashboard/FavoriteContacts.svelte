@@ -2,7 +2,6 @@
     import { contacts } from '$lib/stores/contactsStore'
     import TruncatedPublicKey from '$lib/components/TruncatedPublicKey.svelte';
 
-    // console.log($contacts)
     $: favoriteContacts = $contacts?.filter((contact) => contact.favorite)
 </script>
 
@@ -11,7 +10,6 @@
         <h3>Favorite Contacts</h3>
     </div>
     <table class="table w-full">
-        <!-- head -->
         <thead>
             <tr>
                 <th>Favorite</th>
@@ -20,7 +18,6 @@
                 <th />
             </tr>
         </thead>
-        <!-- row 1 -->
         {#if favoriteContacts}
             <tbody>
                 {#each favoriteContacts as contact (contact.id)}
@@ -58,6 +55,5 @@
                 {/each}
             </tbody>
         {/if}
-        <!-- foot -->
     </table>
 </div>

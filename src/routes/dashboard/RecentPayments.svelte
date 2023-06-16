@@ -1,11 +1,9 @@
 <script>
     import { page } from '$app/stores';
     import { fetchRecentPayments } from '$lib/utils/horizonQueries'
-    import { contacts } from '$lib/stores/contactsStore'
     import TruncatedPublicKey from '$lib/components/TruncatedPublicKey.svelte';
     let publicKey = $page.data.publicKey
     let paymentsPromise = fetchRecentPayments(publicKey)
-    // console.log('payments in RecentPayments', payments)
 </script>
 
 <div class="overflow-x-auto">
@@ -16,7 +14,6 @@
         <p>Loading payments history...</p>
     {:then payments}
         <table class="table">
-            <!-- head -->
             <thead>
                 <tr>
                     <th>Amount</th>

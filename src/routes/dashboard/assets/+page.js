@@ -1,8 +1,3 @@
-// import { fetchAssets } from '$lib/utils/stellarExpert';
-import { getAccountBalances } from '$lib/utils/horizonQueries'
-import { page } from '$app/stores'
-// console.log('pagejsPage',)
-
 /** @type {import('./$types').PageLoad} */
 export async function load({ fetch }) {
     const network = 'testnet'

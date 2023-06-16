@@ -3,10 +3,6 @@
     import RecentPayments from './RecentPayments.svelte'
     import FavoriteContacts from './FavoriteContacts.svelte'
     import TransferHistory from './TransferHistory.svelte'
-
-    /** @type {import('./$types').PageData} */
-    export let data
-    let publicKey = data.publicKey
 </script>
 
 <div class="my-10 mx-20">

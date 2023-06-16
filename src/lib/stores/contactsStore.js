@@ -1,6 +1,3 @@
-// import { writable } from "svelte/store"
-import { browser } from '$app/environment'
-import { localStore } from '$lib/stores/localStore'
 import { v4 as uuidv4 } from 'uuid'
 import { validPublicKey } from '$lib/utils/generateKeypair'
 import { error } from '@sveltejs/kit'

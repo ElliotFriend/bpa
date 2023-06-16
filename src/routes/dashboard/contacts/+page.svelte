@@ -1,6 +1,6 @@
 <script>
     import { contacts } from '$lib/stores/contactsStore'
-
+    import ErrorAlert from '$lib/components/ErrorAlert.svelte'
     let errorMessage
     $: newContact = {
         name: '',
@@ -28,23 +28,7 @@
     <p>We'll manage our contacts here</p>
 
     {#if errorMessage}
-        <div class="alert alert-error shadow-lg">
-            <div>
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="stroke-current flex-shrink-0 h-6 w-6"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    ><path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-                    /></svg
-                >
-                <span>Error! {errorMessage}</span>
-            </div>
-        </div>
+        <ErrorAlert errorMessage={errorMessage} />
     {/if}
 
     <form on:submit|preventDefault={addContact}>

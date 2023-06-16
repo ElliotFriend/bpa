@@ -1,15 +1,11 @@
 <script>
     export const prerender = true
+    export const ssr = false
 
     import '../app.postcss'
 
-
-    import Modal, { bind } from 'svelte-simple-modal'
-    import TxPreviewModal from '$lib/components/TxPreviewModal.svelte';
+    import Modal from 'svelte-simple-modal'
     import { modal } from '$lib/stores/modalStore'
-    // const showModal = () => modal.set(bind(TxPreviewModal, { message: "It's a transaction!" }))
-    export let data
-    // console.log('routes/layout data', data)
 </script>
 
 <Modal

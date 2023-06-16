@@ -62,11 +62,6 @@ export async function submit(transaction) {
     } catch (err) {
         console.log('error in transaction submit', err)
         throw error(400, err)
-        // return {
-        //     success: false,
-        //     data: err.response.data,
-        //     extras: err.response.data.extras,
-        // }
     }
 }
 
@@ -84,7 +79,6 @@ export async function fundWithFriendbot(publicKey) {
 
 export async function fetchRecentPayments(publicKey, limit = 10) {
     let res = await server.payments().forAccount(publicKey).limit(limit).order('desc').call()
-    // console.log('fetch in horizonQueries', res.records)
     return res.records
 }
 

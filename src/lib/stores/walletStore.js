@@ -1,8 +1,6 @@
 import { KeyManager, KeyManagerPlugins, KeyType } from '@stellar/wallet-sdk'
 import { error } from '@sveltejs/kit'
-import { browser } from '$app/environment'
 import { get } from 'svelte/store'
-// import { localStore } from '$lib/stores/localStore'
 import { persisted } from 'svelte-local-storage-store'
 
 
@@ -14,10 +12,6 @@ function createWallet() {
 
         register: (publicKey, secretKey, pincode) => {
 
-            // if (pincode !== confirmPincode) {
-            //     throw error(400, 'pincode mismatch. please try again')
-            // }
-
             const keyManager = setupKeyManager()
 
             keyManager
@@ -28,14 +22,10 @@ function createWallet() {
                         privateKey: secretKey,
                     },
 
-                    password: pincode.toString(),
+                    password: pincode,
                     encrypterName: KeyManagerPlugins.ScryptEncrypter.name,
                 })
                 .then((keyMetadata) => {
-                    // walletStore.setKeyId(keyMetadata.id)
-                    // // console.log("Successfully encrypted and stored key: ", keyMetadata);
-                    // walletStore.setPublicKey(publicKey)
-                    // console.log('first', walletStore)
                     set({
                         keyId: keyMetadata.id,
                         publicKey,
@@ -45,12 +35,6 @@ function createWallet() {
                             secretKey,
                         }
                     })
-                    // console.log('second', walletStore)
-                    // window.localStorage.setItem('bpa:publicKey', JSON.stringify(publicKey))
-                    // console.log('gonna return', keyMetadata.id)
-                    // return keyMetadata.id
-                    // loadUser()
-                    // TODO: redirect to dashboard
                 })
                 .catch((err) => {
                     console.error('Error saving key', err.toString())
@@ -60,14 +44,12 @@ function createWallet() {
 
         sign: (transaction, pincode) => {
             const keyManager = setupKeyManager()
-            // console.log(walletStore)
             let signedTransaction = keyManager.signTransaction({
                 transaction,
                 id: get(walletStore).keyId,
                 password: pincode
             })
             .then((transaction) => {
-                // console.log('transaction typeof', typeof(transaction.toXDR()))
                 return transaction
             })
             .catch((err) => {

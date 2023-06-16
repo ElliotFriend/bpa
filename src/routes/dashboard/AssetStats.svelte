@@ -2,8 +2,7 @@
     import { page } from '$app/stores';
     import { fetchAccount } from '$lib/utils/horizonQueries'
 
-    let publicKey = $page.data.publicKey
-    let accountPromise = fetchAccount(publicKey)
+    let accountPromise = fetchAccount($page.data.publicKey)
 </script>
 
 <div class="prose mt-2 mb-1">

@@ -1,5 +1,4 @@
-import { StellarTomlResolver, TransactionBuilder, Utils } from "stellar-sdk"
-import { walletStore } from '$lib/stores/walletStore'
+import { StellarTomlResolver, Utils } from "stellar-sdk"
 import { error } from "@sveltejs/kit";
 
 export async function fetchStellarToml(homeDomain = 'testanchor.stellar.org') {
@@ -31,13 +30,11 @@ export async function getChallengeTransaction(publicKey, homeDomain = 'testancho
         })}`
     )
     let json = await res.json()
-    console.log('web auth res json ', json)
     return json
 }
 
 export async function validateChallengeTransaction(transactionXDR, network, clientPublicKey, homeDomain = 'testanchor.stellar.org') {
     const { SIGNING_KEY } = await fetchStellarToml(homeDomain)
-    // const transaction = TransactionBuilder.fromXDR(transactionXDR, network)
     try {
         let results = Utils.readChallengeTx(transactionXDR, SIGNING_KEY, network, homeDomain, homeDomain)
         if (results.clientAccountID === clientPublicKey) {
@@ -48,17 +45,6 @@ export async function validateChallengeTransaction(transactionXDR, network, clie
     } catch (err) {
         throw error(400, err)
     }
-    // console.log('challengeTransaction to verify', transaction)
-
-    // if (transaction.sequence === '0')
-    //     results.sequenceZero = true
-
-    // if (transaction.signatures[0])
-    // if (transaction.operations[0].source === clientPublicKey)
-    //     results.firstOp.sourceClient = true
-    // console.log('transactionXDR', transactionXDR)
-    // console.log('something is', something)
-    // return results
 }
 
 export async function submitChallengeTransaction(transactionXDR, homeDomain = 'testanchor.stellar.org') {
@@ -75,6 +61,3 @@ export async function submitChallengeTransaction(transactionXDR, homeDomain = 't
     }
     return json.token
 }
-// export async function signChallengeTransaction(transaction, pincode) {
-
-// }

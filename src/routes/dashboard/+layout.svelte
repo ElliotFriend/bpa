@@ -1,11 +1,7 @@
 <script>
-
     import Navbar from './Navbar.svelte'
     import Sidebar from './Sidebar.svelte'
     import Footer from './Footer.svelte'
-
-    /** @type {import('./$types').LayoutData} */
-    export let data
 </script>
 
 <div class="flex flex-col">
@@ -20,5 +16,3 @@
 
     <Footer />
 </div>
-
-<!-- <TxPreviewModal /> -->

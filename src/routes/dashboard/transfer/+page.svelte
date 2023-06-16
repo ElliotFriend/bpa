@@ -1,12 +1,7 @@
 <script>
     /** @type {import('./$types').PageData} */
     export let data
-    $: errorMessage = null
-
-    // import { Buffer } from 'buffer'
-    // console.log('routes/transfer/+page.svelte data', data)
-    // let receivedMemo = "AAAAAAAAAAAAAAAAAAAAAAyHvUNuIEhUtJyZQ0sGgKQ="
-    // console.log('does buffer work now?', Buffer.from(receivedMemo, 'base64').toString('hex'))
+    let errorMessage = null
 
     import { getBalanceHomeDomains, getAccountBalances, startTransaction } from '$lib/utils/horizonQueries'
     import { getSep10Domains } from '$lib/utils/sep10'
@@ -21,13 +16,12 @@
     }
 
     import { modalStore } from '$lib/stores/modalStore'
-    // import { walletStore } from '$lib/stores/walletStore'
     import PinModal from '$lib/components/PinModal.svelte';
     import { getContext } from 'svelte'
     const { open } = getContext('simple-modal')
     import { getChallengeTransaction, validateChallengeTransaction } from '$lib/utils/sep10'
     import ErrorAlert from '$lib/components/ErrorAlert.svelte'
-    import { TransactionBuilder, Networks, Asset, Memo, Operation, xdr } from 'stellar-sdk'
+    import { Asset, Memo, Operation } from 'stellar-sdk'
 
     const transfer = async (direction, homeDomain = 'testanchor.stellar.org') => {
         let { id, type, url } = await initiateTransfer($webAuthStore.token, direction, homeDomain)
@@ -128,10 +122,10 @@
         {#each homeDomains as asset}
             {asset.asset_code} <small>{asset.home_domain}</small>
             <form on:submit|preventDefault={() => transfer('deposit', asset.home_domain)}>
-                <button class="btn">SEP-24 Deposit</button>
+                <button class="btn" type="submit">SEP-24 Deposit</button>
             </form>
             <form on:submit|preventDefault={() => transfer('withdraw', asset.home_domain)}>
-                <button class="btn">SEP-24 Withdraw</button>
+                <button class="btn" type="submit">SEP-24 Withdraw</button>
             </form>
             <form on:submit|preventDefault={() => auth(asset.home_domain)}>
                 <button class="btn" type="submit">Authenticate</button>

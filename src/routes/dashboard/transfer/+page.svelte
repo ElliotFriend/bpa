@@ -1,22 +1,30 @@
 <script>
     /** @type {import('./$types').PageData} */
     export let data
-    let errorMessage = null
 
+    let errorMessage = null
+    let publicKey = data.publicKey
+
+    import { Buffer } from 'buffer'
     import { getBalanceHomeDomains, getAccountBalances, startTransaction } from '$lib/utils/horizonQueries'
+    import { initiateTransfer6 } from '$lib/utils/sep6'
     import { getSep10Domains } from '$lib/utils/sep10'
-    import { initiateTransfer } from '$lib/utils/sep24'
+    import { getSep12Fields, putSep12Fields, deleteSep12Customer } from '$lib/utils/sep12'
+    import { initiateTransfer, queryTransfers } from '$lib/utils/sep24'
     import { webAuthStore } from '$lib/stores/webAuthStore'
     import { transfers } from '$lib/stores/transfersStore'
 
     let homeDomainPromise = async () => {
-        let balances = await getAccountBalances(data.publicKey)
-        let balancesWithHomeDomains = await getBalanceHomeDomains(balances)
-        return getSep10Domains(balancesWithHomeDomains)
+        return getAccountBalances(publicKey)
+        .then(balances => getBalanceHomeDomains(balances))
+        .then(balancesWithHomeDomains => getSep10Domains(balancesWithHomeDomains))
+        // let balancesWithHomeDomains = await getBalanceHomeDomains(balances)
+        // return getSep10Domains(balancesWithHomeDomains)
     }
 
     import { modalStore } from '$lib/stores/modalStore'
     import PinModal from '$lib/components/PinModal.svelte';
+    import TransferModal from '$lib/components/TransferModal.svelte'
     import { getContext } from 'svelte'
     const { open } = getContext('simple-modal')
     import { getChallengeTransaction, validateChallengeTransaction } from '$lib/utils/sep10'
@@ -24,7 +32,7 @@
     import { Asset, Memo, Operation } from 'stellar-sdk'
 
     const transfer = async (direction, homeDomain = 'testanchor.stellar.org') => {
-        let { id, type, url } = await initiateTransfer($webAuthStore.token, direction, homeDomain)
+        let { id, type, url } = await initiateTransfer($webAuthStore[homeDomain], direction, homeDomain)
         console.log('interactive transfer response', { id, type, url })
         let interactiveUrl = `${url}&callback=postMessage`
         let popup = window.open(interactiveUrl, 'bpaTransferWindow', 'popup')
@@ -33,7 +41,8 @@
             "message",
             async (event) => {
                 console.log('here is the event i heard', event)
-                let transaction = await startTransaction(data.publicKey)
+                popup.close()
+                let transaction = await startTransaction(publicKey)
                 transaction = transaction
                     .addMemo(Memo.hash(Buffer.from(event.data.transaction.withdraw_memo, 'base64').toString('hex')))
                     .addOperation(Operation.payment({
@@ -75,15 +84,17 @@
     }
 
     const auth = async (homeDomain = 'testanchor.stellar.org') => {
-        let { transaction, network_passphrase } = await getChallengeTransaction(data.publicKey, homeDomain)
+        let { transaction, network_passphrase } = await getChallengeTransaction(publicKey, homeDomain)
+        console.log('transaction', transaction)
         $modalStore.txXDR = transaction
         $modalStore.challengeNetwork = network_passphrase
-        let results = await validateChallengeTransaction(transaction, network_passphrase, data.publicKey)
+        let results = await validateChallengeTransaction(transaction, network_passphrase, publicKey)
         console.log('results in transfer page', results)
         open(PinModal,
             {
                 hasPincodeForm: true,
                 challengeTransaction: true,
+                challengeHomeDomain: homeDomain,
                 body: 'Please confirm your ownership of this account by signing this challenge transaction. This transaction has already been checked and verified and everything looks good from what we can tell. Feel free to double-check that everything lines up with the SEP-0010 challenge yourself, though.'
             }, { },
             {
@@ -106,6 +117,39 @@
             }
         )
     }
+
+    const query = async (assetCode, homeDomain = 'testanchor.stellar.org') => {
+        let transfers = await queryTransfers($webAuthStore[homeDomain], assetCode, homeDomain)
+        console.log('transfers history', transfers)
+    }
+
+    const transfer6 = async (direction, assetCode, homeDomain = 'testanchor.stellar.org') => {
+        let transfer6 = await initiateTransfer6($webAuthStore[homeDomain], assetCode, data.publicKey, direction, homeDomain)
+        console.log(transfer6)
+        return transfer6
+    }
+
+    const sep12Fields = async ( homeDomain = 'testAnchor.stellar.org', type = 'bank_account') => {
+        let sep12fields = await getSep12Fields($webAuthStore[homeDomain], homeDomain, type)
+        console.log('sep12fields', sep12fields)
+    }
+
+    const putFields = async (homeDomain = 'testanchor.stellar.org') => {
+        let fields = {
+            'first_name': 'steve',
+        }
+        let putResposne = await putSep12Fields($webAuthStore[homeDomain], fields, homeDomain )
+        console.log('putResponse', putResposne)
+    }
+
+    const deleteCustomer = async (homeDomain = 'testanchor.stellar.org') => {
+        let deleteResponse = await deleteSep12Customer($webAuthStore[homeDomain], publicKey)
+        console.log('deleteResponse', deleteResponse)
+    }
+
+    const launchTransferModal = (homeDomain = 'testanchor.stellar.org') => {
+        open(TransferModal)
+    }
 </script>
 
 <div class="my-10 mx-20 prose">
@@ -121,14 +165,31 @@
     {:then homeDomains}
         {#each homeDomains as asset}
             {asset.asset_code} <small>{asset.home_domain}</small>
+            <form on:submit|preventDefault={() => transfer6('deposit', asset.asset_code, asset.home_domain)}>
+                <button class="btn" type="submit">SEP-6 Deposit</button>
+            </form>
+            <form on:submit|preventDefault={() => sep12Fields(asset.home_domain)}>
+                <button class="btn" type="submit">GET SEP-12 Fields</button>
+            </form>
+            <form on:submit|preventDefault={() => putFields(asset.home_domain)}>
+                <button class="btn" type="submit">PUT SEP-12 Fields</button>
+            </form>
+            <form on:submit|preventDefault={() => deleteCustomer(asset.home_domain)}>
+                <button class="btn" type="submit">DELETE SEP-12 Customer</button>
+            </form>
+            <button class="btn" on:click={launchTransferModal}>Launch Transfer Modal</button>
+            <p>The following buttons already are working. Don't screw with them!</p>
             <form on:submit|preventDefault={() => transfer('deposit', asset.home_domain)}>
-                <button class="btn" type="submit">SEP-24 Deposit</button>
+                <button class="btn btn-primary" type="submit">SEP-24 Deposit</button>
             </form>
             <form on:submit|preventDefault={() => transfer('withdraw', asset.home_domain)}>
-                <button class="btn" type="submit">SEP-24 Withdraw</button>
+                <button class="btn btn-primary" type="submit">SEP-24 Withdraw</button>
             </form>
             <form on:submit|preventDefault={() => auth(asset.home_domain)}>
                 <button class="btn" type="submit">Authenticate</button>
+            </form>
+            <form on:submit|preventDefault={() => query(asset.asset_code, asset.home_domain)}>
+                <button class="btn" type="submit">Query Transfers</button>
             </form>
         {/each}
     {/await}

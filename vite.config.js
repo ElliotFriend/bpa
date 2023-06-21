@@ -1,8 +1,6 @@
 import { sveltekit } from '@sveltejs/kit/vite'
 import { defineConfig } from 'vite'
-
 import { NodeGlobalsPolyfillPlugin } from '@esbuild-plugins/node-globals-polyfill'
-// import rollupNodePolyFill from 'rollup-plugin-node-polyfills'
 import inject from '@rollup/plugin-inject'
 import path from 'path'
 
@@ -14,21 +12,20 @@ export default defineConfig({
                 global: 'globalThis',
             },
             plugins: [
-                NodeGlobalsPolyfillPlugin({
-                    buffer: true,
-                }),
-            ],
+				NodeGlobalsPolyfillPlugin({
+					buffer: true
+				})
+			]
         },
-        include: ['@stellar/wallet-sdk', '@albedo-link/intent']
     },
     build: {
         rollupOptions: {
-            plugins: [
-                inject({
-                    window: path.resolve('src/lib/window.js')
-                }),
-            ]
-        },
+			plugins: [
+				inject({
+					window: path.resolve('src/lib/window.ts'),
+				}),
+			]
+		}
     },
     ssr: {
         noExternal: ['@stellar/wallet-sdk'],

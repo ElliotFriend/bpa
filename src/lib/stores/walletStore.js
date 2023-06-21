@@ -1,4 +1,5 @@
 import { KeyManager, KeyManagerPlugins, KeyType } from '@stellar/wallet-sdk'
+import { Networks } from 'stellar-sdk'
 import { error } from '@sveltejs/kit'
 import { get } from 'svelte/store'
 import { persisted } from 'svelte-local-storage-store'

@@ -25,24 +25,28 @@ export async function fetchAccount(publicKey) {
 
 export async function loadAccount(publicKey) {
     try {
+        console.log('here is the publicKey for me to load', publicKey)
         const account = await server.loadAccount(publicKey)
+        console.log('here is the server response', account)
         return {
             account,
         }
     } catch (err) {
         // We expect horizon to response with a 404 if the account isn't funded
-        if (err.response.status === 404) {
+        if (err.response?.status === 404) {
             return {
                 funded: false,
             }
         } else {
-            throw error(err.response.status, `${err.response.title} - ${err.response.detail}`)
+            throw error(err.response?.status || 400, err)
         }
     }
 }
 
 export async function startTransaction(sourcePublicKey) {
+    console.log('here is the sourcePublicKey', sourcePublicKey)
     const source = await loadAccount(sourcePublicKey)
+    console.log('here is the loaded account', source)
     const transaction = new TransactionBuilder(source.account, {
         networkPassphrase: Networks.TESTNET,
         fee: 100000,

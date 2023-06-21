@@ -11,9 +11,10 @@
 
     export let title = 'Transaction Preview'
     export let body = 'Please confirm the transaction below in order to sign and submit it to the network'
-    export let firstPincode
+    export let firstPincode = ''
     export let realTransaction = false
     export let challengeTransaction = false
+    export let challengeHomeDomain = ''
     export let hasPincodeForm = false
 
     let confirmPincode = null
@@ -34,7 +35,7 @@
             } else if (challengeTransaction) {
                 let signedTransaction = await walletStore.sign(transaction, confirmPincode.toString())
                 let token = await submitChallengeTransaction(signedTransaction.toXDR())
-                webAuthStore.set({ token })
+                webAuthStore.setAuth(challengeHomeDomain, token)
                 $modalStore.confirmPincode = false
                 close()
             } else if (realTransaction && transaction !== null) {

@@ -1,7 +1,4 @@
 <script>
-    export const prerender = true
-    export const ssr = false
-
     import '../app.postcss'
 
     import Modal from 'svelte-simple-modal'

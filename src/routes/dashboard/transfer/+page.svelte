@@ -7,7 +7,7 @@
 
     import { Buffer } from 'buffer'
     import { getBalanceHomeDomains, getAccountBalances, startTransaction } from '$lib/utils/horizonQueries'
-    import { initiateTransfer6 } from '$lib/utils/sep6'
+    import { initiateTransfer6, queryTransfers6 } from '$lib/utils/sep6'
     import { getSep10Domains } from '$lib/utils/sep10'
     import { getSep12Fields, putSep12Fields, deleteSep12Customer } from '$lib/utils/sep12'
     import { initiateTransfer, queryTransfers } from '$lib/utils/sep24'
@@ -119,8 +119,13 @@
     }
 
     const query = async (assetCode, homeDomain = 'testanchor.stellar.org') => {
-        let transfers = await queryTransfers($webAuthStore[homeDomain], assetCode, homeDomain)
-        console.log('transfers history', transfers)
+        let { transactions } = await queryTransfers($webAuthStore[homeDomain], assetCode, homeDomain)
+        console.log('transfers history', transactions)
+    }
+
+    const query6 = async (assetCode, homeDomain = 'testanchor.stellar.org') => {
+        let { transactions } = await queryTransfers6($webAuthStore[homeDomain], assetCode, publicKey, homeDomain)
+        console.log('transfers6 history', transactions)
     }
 
     const transfer6 = async (direction, assetCode, homeDomain = 'testanchor.stellar.org') => {
@@ -178,6 +183,9 @@
                 <button class="btn" type="submit">DELETE SEP-12 Customer</button>
             </form>
             <button class="btn" on:click={launchTransferModal}>Launch Transfer Modal</button>
+            <form on:submit|preventDefault={() => query6(asset.asset_code, asset.home_domain)}>
+                <button class="btn" type="submit">Query SEP-6 Transfers</button>
+            </form>
             <p>The following buttons already are working. Don't screw with them!</p>
             <form on:submit|preventDefault={() => transfer('deposit', asset.home_domain)}>
                 <button class="btn btn-primary" type="submit">SEP-24 Deposit</button>

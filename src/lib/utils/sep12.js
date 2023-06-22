@@ -1,5 +1,7 @@
 import { StellarTomlResolver } from "stellar-sdk"
 
+// TODO: Make it so that anchors without a `KYC_SERVER` toml entry will use the anchor's `TRANSFER_SERVER` instead.
+
 export async function getSep12Fields(authToken, homeDomain = 'testanchor.stellar.org') {
     let { KYC_SERVER } = await StellarTomlResolver.resolve(homeDomain)
 
@@ -11,9 +13,9 @@ export async function getSep12Fields(authToken, homeDomain = 'testanchor.stellar
         }
     })
 
-    console.log('sep12 res', res)
+    console.log('sep12 get res', res)
     let json = await res.json()
-    console.log('sep12 json', json)
+    console.log('sep12 get json', json)
     return json
 }
 

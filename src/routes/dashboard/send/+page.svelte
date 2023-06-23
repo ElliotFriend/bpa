@@ -61,11 +61,13 @@
         }
         transaction = transaction.setTimeout(300).build()
         $modalStore.txXDR = transaction.toXDR()
-        open(PinModal,
+        open(
+            PinModal,
             {
                 hasPincodeForm: true,
                 realTransaction: true,
-            }, { },
+            },
+            {},
             {
                 onOpen: () => {
                     $modalStore.errorMessage = null
@@ -82,13 +84,13 @@
                 },
                 onClosed: () => {
                     $modalStore.txXDR = null
-                }
+                },
             }
         )
     }
 </script>
 
-<div class="prose my-10 mx-20">
+<div class="prose mx-20 my-10">
     <h1>Send a Payment</h1>
     <p>This is where you'll be able to send a payment</p>
 
@@ -107,7 +109,7 @@
             <select
                 id="destination"
                 name="destination"
-                class="select select-bordered"
+                class="select-bordered select"
                 bind:value={destinationPublicKey}
                 on:change={checkDestination(destinationPublicKey)}
             >
@@ -130,16 +132,18 @@
                     name="otherDestination"
                     type="text"
                     placeholder="G..."
-                    class="input input-bordered w-full max-w-xs"
+                    class="input-bordered input w-full max-w-xs"
                     bind:value={otherPublicKey}
                     on:change={checkDestinationFunded(otherPublicKey)}
                 />
             </div>
         {/if}
         {#if createAccount}
-            <WarningAlert warningMessage="Account Not Funded: You are sending a payment to an account that does not yet
+            <WarningAlert
+                warningMessage="Account Not Funded: You are sending a payment to an account that does not yet
             exist on the Stellar ledger. Your payment will take the form of a
-            <code>creatAccount</code> operation, and the amount you send must be at least 1XLM." />
+            <code>creatAccount</code> operation, and the amount you send must be at least 1XLM."
+            />
         {/if}
         <div class="form-control">
             <label for="amount" class="label">
@@ -151,7 +155,7 @@
                     name="amount"
                     type="text"
                     placeholder="0.01"
-                    class="input input-bordered"
+                    class="input-bordered input"
                     bind:value={paymentAmount}
                 />
                 <span>XLM</span>
@@ -166,12 +170,12 @@
                 name="memo"
                 type="text"
                 placeholder="Optional"
-                class="input input-bordered"
+                class="input-bordered input"
                 bind:value={memoText}
             />
         </div>
         <div class="form-control">
-            <button type="submit" class="btn btn-primary">Preview</button>
+            <button type="submit" class="btn-primary btn">Preview</button>
         </div>
     </form>
 </div>

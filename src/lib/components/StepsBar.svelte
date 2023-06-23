@@ -34,7 +34,6 @@
     }
 </script>
 
-
 <div class="not-prose">
     <ul class="steps w-full" bind:this={stepMarkers}>
         {#each steps as step, i}

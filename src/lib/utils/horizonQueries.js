@@ -9,7 +9,7 @@ export async function fetchAccount(publicKey) {
         let account = await server.accounts().accountId(publicKey).call()
         return {
             account,
-            funded: true
+            funded: true,
         }
     } catch (err) {
         if (err.response?.status === 404) {
@@ -17,10 +17,12 @@ export async function fetchAccount(publicKey) {
                 funded: false,
             }
         } else {
-            throw error(err.response?.status ?? 400, `${err.response?.title} - ${err.response?.detail}`)
+            throw error(
+                err.response?.status ?? 400,
+                `${err.response?.title} - ${err.response?.detail}`
+            )
         }
     }
-
 }
 
 export async function loadAccount(publicKey) {
@@ -70,7 +72,9 @@ export async function submit(transaction) {
 }
 
 export async function getAccountBalances(publicKey) {
-    const { account: { balances } } = await fetchAccount(publicKey)
+    const {
+        account: { balances },
+    } = await fetchAccount(publicKey)
     return balances
 }
 
@@ -94,12 +98,12 @@ export async function getBalanceHomeDomains(balances) {
                 if (account.home_domain) {
                     return {
                         ...asset,
-                        home_domain: account.home_domain
+                        home_domain: account.home_domain,
                     }
                 }
             }
         })
     )
 
-    return homeDomains.filter(balance => balance)
+    return homeDomains.filter((balance) => balance)
 }

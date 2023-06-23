@@ -1,7 +1,7 @@
 <script>
-    import { page } from '$app/stores';
+    import { page } from '$app/stores'
     import { fetchRecentPayments } from '$lib/utils/horizonQueries'
-    import TruncatedPublicKey from '$lib/components/TruncatedPublicKey.svelte';
+    import TruncatedPublicKey from '$lib/components/TruncatedPublicKey.svelte'
     let publicKey = $page.data.publicKey
     let paymentsPromise = fetchRecentPayments(publicKey)
 </script>

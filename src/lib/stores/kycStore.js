@@ -1,4 +1,4 @@
-import { persisted } from "svelte-local-storage-store"
+import { persisted } from 'svelte-local-storage-store'
 
 // These fields are derived from the Standard KYC Fields outlined in SEP-0009
 // https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0009.md

@@ -1,9 +1,10 @@
 import { KeyManager, KeyManagerPlugins, KeyType } from '@stellar/wallet-sdk'
-import { Networks } from 'stellar-sdk'
+// import pkg from '@stellar/wallet-sdk';
+// const { KeyType, KeyManagerPlugins, KeyManager } = pkg;
+// import { Networks } from 'stellar-sdk'
 import { error } from '@sveltejs/kit'
 import { get } from 'svelte/store'
 import { persisted } from 'svelte-local-storage-store'
-
 
 function createWallet() {
     const { subscribe, set, update } = persisted('bpa:walletStore', {})
@@ -12,7 +13,6 @@ function createWallet() {
         subscribe,
 
         register: (publicKey, secretKey, pincode) => {
-
             const keyManager = setupKeyManager()
 
             keyManager
@@ -34,7 +34,7 @@ function createWallet() {
                         // in case we need to do some manual transactions or something.
                         devInfo: {
                             secretKey,
-                        }
+                        },
                     })
                 })
                 .catch((err) => {
@@ -45,21 +45,22 @@ function createWallet() {
 
         sign: (transaction, pincode) => {
             const keyManager = setupKeyManager()
-            let signedTransaction = keyManager.signTransaction({
-                transaction,
-                id: get(walletStore).keyId,
-                password: pincode
-            })
-            .then((transaction) => {
-                return transaction
-            })
-            .catch((err) => {
-                console.error('Error signing transaction', err)
-                throw error(400, err)
-            })
+            let signedTransaction = keyManager
+                .signTransaction({
+                    transaction,
+                    id: get(walletStore).keyId,
+                    password: pincode,
+                })
+                .then((transaction) => {
+                    return transaction
+                })
+                .catch((err) => {
+                    console.error('Error signing transaction', err)
+                    throw error(400, err)
+                })
 
             return signedTransaction
-        }
+        },
     }
 }
 

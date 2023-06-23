@@ -1,15 +1,15 @@
 <script>
-    import { page } from "$app/stores";
+    import { page } from '$app/stores'
     let publicKey = $page.data.publicKey
 </script>
 
 <header class="navbar bg-base-300">
     <div class="flex-1">
-        <a href="/dashboard" class="btn btn-ghost normal-case text-xl">BasicPay</a>
+        <a href="/dashboard" class="btn-ghost btn text-xl normal-case">BasicPay</a>
     </div>
     <div class="flex-none">
-        <div class="dropdown dropdown-end">
-            <button tabindex="0" class="btn btn-ghost btn-circle avatar">
+        <div class="dropdown-end dropdown">
+            <button tabindex="0" class="btn-ghost btn-circle avatar btn">
                 {#if publicKey}
                     <div class="w-10 rounded-full">
                         <img
@@ -18,15 +18,15 @@
                         />
                     </div>
                 {:else}
-                    <div class="avatar placeholder">
-                        <div class="bg-neutral-focus text-neutral-content rounded-full w-10">
+                    <div class="placeholder avatar">
+                        <div class="w-10 rounded-full bg-neutral-focus text-neutral-content">
                             <span class="text-l">G</span>
                         </div>
                     </div>
                 {/if}
             </button>
             <ul
-                class="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52"
+                class="menu-compact dropdown-content menu rounded-box mt-3 w-52 bg-base-100 p-2 shadow"
             >
                 <li>
                     <a href="#" class="justify-between">

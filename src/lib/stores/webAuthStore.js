@@ -1,4 +1,4 @@
-import { persisted } from "svelte-local-storage-store"
+import { persisted } from 'svelte-local-storage-store'
 
 function createWebAuthStore() {
     const { subscribe, set, update } = persisted('bpa:webAuthStore', {})
@@ -10,9 +10,9 @@ function createWebAuthStore() {
             update((store) => {
                 return {
                     ...store,
-                    [homeDomain]: token
+                    [homeDomain]: token,
                 }
-            })
+            }),
     }
 }
 export const webAuthStore = createWebAuthStore()

@@ -1,4 +1,4 @@
-<footer class="footer footer-center p-4 bg-base-300 text-base-content">
+<footer class="footer footer-center bg-base-300 p-4 text-base-content">
     <div>
         <p>Copyright © 2023 - All right reserved by the Stellar Development Foundation</p>
     </div>

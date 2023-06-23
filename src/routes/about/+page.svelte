@@ -3,7 +3,7 @@
     export let data
 </script>
 
-<div class="p-8 my-10 mx-auto max-w-2xl bg-base-300 rounded-lg">
+<div class="mx-auto my-10 max-w-2xl rounded-lg bg-base-300 p-8">
     <div class="prose">
         <div>
             <h1>About BasicPay</h1>

@@ -28,11 +28,11 @@
     <div class="hero-content flex-col lg:flex-row-reverse">
         <div class="text-center lg:text-left">
             {#if $errorMessage}
-                <div class="alert alert-error shadow-lg mb-4">
+                <div class="alert alert-error mb-4 shadow-lg">
                     <div>
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            class="stroke-current flex-shrink-0 h-6 w-6"
+                            class="h-6 w-6 flex-shrink-0 stroke-current"
                             fill="none"
                             viewBox="0 0 24 24"
                             ><path
@@ -46,7 +46,7 @@
                     </div>
                 </div>
             {/if}
-            <div class="card flex-shrink-0 w-full max-w-sm shadow-2xl bg-base-100">
+            <div class="card w-full max-w-sm flex-shrink-0 bg-base-100 shadow-2xl">
                 <div class="card-body">
                     <h1 class="text-5xl font-bold">Login</h1>
                     <div class="form-control">
@@ -58,7 +58,7 @@
                             type="text"
                             placeholder="G..."
                             id="publicKey"
-                            class="input input-bordered"
+                            class="input-bordered input"
                             disabled
                         />
                     </div>
@@ -70,11 +70,11 @@
                             bind:value={$pincode}
                             type="number"
                             id="pincode"
-                            class="input input-bordered"
+                            class="input-bordered input"
                         />
                     </div>
                     <div class="form-control mt-6">
-                        <button on:click={login} class="btn btn-primary">Login</button>
+                        <button on:click={login} class="btn-primary btn">Login</button>
                     </div>
                 </div>
             </div>

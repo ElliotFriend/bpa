@@ -5,7 +5,11 @@
     const transfersPromise = async () => {
         let allTransfers = []
         for (const homeDomain in $webAuthStore) {
-            let { transactions } = await queryTransfers($webAuthStore[homeDomain], 'SRT', homeDomain)
+            let { transactions } = await queryTransfers(
+                $webAuthStore[homeDomain],
+                'SRT',
+                homeDomain
+            )
             allTransfers.push(...transactions)
         }
         // console.log(allTransfers)
@@ -20,7 +24,7 @@
     {#await transfersPromise()}
         <p>loading transfers...</p>
     {:then transfers}
-        <table class="table table-compact w-full table-auto">
+        <table class="table-compact table w-full table-auto">
             <thead>
                 <tr>
                     <th>Amount</th>
@@ -42,7 +46,11 @@
                         <td>{new Date(Date.parse(transfer.started_at)).toLocaleString()}</td>
                         <td>
                             {#if transfer.status === 'completed'}
-                                <a target="_blank" href={`https://stellar.expert/explorer/testnet/tx/${transfer.stellar_transaction_id}`}>View Stellar transaction</a>
+                                <a
+                                    target="_blank"
+                                    href={`https://stellar.expert/explorer/testnet/tx/${transfer.stellar_transaction_id}`}
+                                    >View Stellar transaction</a
+                                >
                             {:else}
                                 <a target="_blank" href={transfer.more_info_url}>View more info</a>
                             {/if}

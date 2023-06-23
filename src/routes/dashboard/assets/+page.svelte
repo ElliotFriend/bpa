@@ -2,7 +2,7 @@
     import { Asset, Operation } from 'stellar-sdk'
     import { getAccountBalances, startTransaction } from '$lib/utils/horizonQueries'
     import { modalStore } from '$lib/stores/modalStore'
-    import PinModal from '$lib/components/PinModal.svelte';
+    import PinModal from '$lib/components/PinModal.svelte'
     import { enhance } from '$app/forms'
     import { getContext } from 'svelte'
     const { open } = getContext('simple-modal')
@@ -22,30 +22,35 @@
     const previewTransaction = async (adding = true, removeAsset = null) => {
         let transaction = await startTransaction(data.publicKey)
         let asset = adding && addAsset && !removeAsset ? addAsset : removeAsset
-        const assetObj = asset === 'custom' ? new Asset(customCode, customIssuer) : new Asset(asset.split('-')[0], asset.split('-')[1])
+        const assetObj =
+            asset === 'custom'
+                ? new Asset(customCode, customIssuer)
+                : new Asset(asset.split('-')[0], asset.split('-')[1])
 
         if (adding) {
             transaction.addOperation(
                 Operation.changeTrust({
-                    asset: assetObj
+                    asset: assetObj,
                 })
             )
         } else {
             transaction.addOperation(
                 Operation.changeTrust({
                     asset: assetObj,
-                    limit: '0'
+                    limit: '0',
                 })
             )
         }
 
         transaction = transaction.setTimeout(300).build()
         $modalStore.txXDR = transaction.toXDR()
-        open(PinModal,
+        open(
+            PinModal,
             {
                 hasPincodeForm: true,
                 realTransaction: true,
-            }, { },
+            },
+            {},
             {
                 onOpen: () => {
                     $modalStore.errorMessage = null
@@ -60,23 +65,32 @@
                 },
                 onClosed: () => {
                     $modalStore.txXDR = null
-                }
+                },
             }
         )
     }
 </script>
 
-<div class="prose my-10 mx-20">
+<div class="prose mx-20 my-10">
     <h1>Assets</h1>
     <h2>Add Trusted Assets</h2>
     <form on:submit|preventDefault={previewTransaction}>
         <label for="asset" class="label">
             <span class="label-text">Asset</span>
         </label>
-        <select id="asset" name="asset" class="select select-bordered w-full max-w-xs" bind:value={addAsset}>
+        <select
+            id="asset"
+            name="asset"
+            class="select-bordered select w-full max-w-xs"
+            bind:value={addAsset}
+        >
             <option disabled value={null} selected>Select Asset</option>
-            <option value="SRT-GCDNJUBQSX7AJWLJACMJ7I4BC3Z47BQUTMHEICZLE6MU4KQBRYG5JY6B">testanchor SRT-GCDNJUBQSX7AJWLJACMJ7I4BC3Z47BQUTMHEICZLE6MU4KQBRYG5JY6B</option>
-            <option value="USDC-GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5">testanchor USDC-GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5</option>
+            <option value="SRT-GCDNJUBQSX7AJWLJACMJ7I4BC3Z47BQUTMHEICZLE6MU4KQBRYG5JY6B"
+                >testanchor SRT-GCDNJUBQSX7AJWLJACMJ7I4BC3Z47BQUTMHEICZLE6MU4KQBRYG5JY6B</option
+            >
+            <option value="USDC-GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5"
+                >testanchor USDC-GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5</option
+            >
             {#each data.assets as { asset }}
                 <option value={asset}>{asset.slice()}</option>
             {/each}
@@ -84,15 +98,27 @@
         </select>
         {#if addAsset === 'custom'}
             <div class="join">
-                <div><div>
-                    <input class="input input-bordered join-item" placeholder="Asset Code" bind:value={customCode} />
-                </div></div>
-                <div><div>
-                    <input class="input input-bordered join-item" placeholder="Asset Issuer" bind:value={customIssuer} />
-                </div></div>
+                <div>
+                    <div>
+                        <input
+                            class="input-bordered input join-item"
+                            placeholder="Asset Code"
+                            bind:value={customCode}
+                        />
+                    </div>
+                </div>
+                <div>
+                    <div>
+                        <input
+                            class="input-bordered input join-item"
+                            placeholder="Asset Issuer"
+                            bind:value={customIssuer}
+                        />
+                    </div>
+                </div>
             </div>
         {/if}
-        <button class="btn btn-primary">Add Asset</button>
+        <button class="btn-primary btn">Add Asset</button>
     </form>
     <h2 class="text-3xl font-bold">Existing Balances</h2>
     {#await balancesPromise}
@@ -115,11 +141,13 @@
                         <tr>
                             <td>{balance.balance}</td>
                             <td>{balance.asset_code ?? 'XLM'}</td>
-                            <td>{#if balance.asset_issuer}
-                                <TruncatedPublicKey publicKey={balance.asset_issuer} />
+                            <td
+                                >{#if balance.asset_issuer}
+                                    <TruncatedPublicKey publicKey={balance.asset_issuer} />
                                 {:else}
-                                n/a
-                            {/if}</td>
+                                    n/a
+                                {/if}</td
+                            >
                             <td
                                 >{(
                                     parseFloat(balance.buying_liabilities) +
@@ -129,13 +157,19 @@
                             <td>{balance.limit ?? 'n/a'}</td>
                             <th>
                                 {#if balance.asset_type !== 'native'}
-                                    <form on:submit|preventDefault={() => previewTransaction(false, `${balance.asset_code}-${balance.asset_issuer}`)}>
-                                        <button type="submit" class="btn btn-square btn-error">
+                                    <form
+                                        on:submit|preventDefault={() =>
+                                            previewTransaction(
+                                                false,
+                                                `${balance.asset_code}-${balance.asset_issuer}`
+                                            )}
+                                    >
+                                        <button type="submit" class="btn-error btn-square btn">
                                             <svg
                                                 xmlns="http://www.w3.org/2000/svg"
                                                 viewBox="0 0 20 20"
                                                 fill="currentColor"
-                                                class="w-5 h-5"
+                                                class="h-5 w-5"
                                             >
                                                 <path
                                                     fill-rule="evenodd"

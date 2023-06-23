@@ -16,5 +16,5 @@
             <span class="label-text">{label}</span>
         </label>
     {/if}
-    <input class="input input-bordered w-full" use:typeAction bind:value={value} />
+    <input class="input-bordered input w-full" use:typeAction bind:value={value} />
 </div>

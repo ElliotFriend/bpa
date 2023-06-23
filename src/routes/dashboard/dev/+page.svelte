@@ -46,11 +46,14 @@
     }
 </script>
 
-<div class="prose my-10 mx-20">
+<div class="prose mx-20 my-10">
     <h1 class="text-5xl font-bold">Dev Helpers</h1>
     {#if browser}
         <h2 class="text-3xl font-bold">Keypair Information</h2>
-        <p>These can be helpful to know in case you need to manually create some transactions that we aren't setup to do yet.</p>
+        <p>
+            These can be helpful to know in case you need to manually create some transactions that
+            we aren't setup to do yet.
+        </p>
         <dl>
             <dt><strong>Public Key</strong></dt>
             <dd><code>{$walletStore.publicKey}</code></dd>
@@ -81,21 +84,20 @@
             bind:checked={trustlineContacts}
         />
     </label>
-    <button class="btn btn-primary" on:click={addContacts}>Add Contacts</button>
+    <button class="btn-primary btn" on:click={addContacts}>Add Contacts</button>
     <h2 class="text-3xl font-bold">Burn Bridges</h2>
     <p>Delete the contacts list</p>
-    <button class="btn btn-error" on:click={contacts.empty}>Empty Contacts</button>
+    <button class="btn-error btn" on:click={contacts.empty}>Empty Contacts</button>
     <h2 class="text-3xl font-bold">Get Rich</h2>
     <p>Get your own account funded by friendbot</p>
-    <button class="btn btn-success" on:click={mergeFriendbotAccount($walletStore.publicKey)}
+    <button class="btn-success btn" on:click={mergeFriendbotAccount($walletStore.publicKey)}
         >I need a friend!</button
     >
     <h2 class="text-3xl font-bold">Launch Modal Rocket</h2>
     <p>Test the modal thing to see what comes up... I guess?</p>
     <input type="text" bind:value={modalButtonText} />
     <!-- <Modal show={$modal}> -->
-    <button on:click={open}
-        class="btn btn-primary">{modalButtonText}</button>
+    <button on:click={open} class="btn-primary btn">{modalButtonText}</button>
     <!-- </Modal> -->
     <!-- <label for="my-modal" class="btn btn-primary">open modal</label> -->
     <!-- <ModalButton buttonText={modalButtonText} /> -->

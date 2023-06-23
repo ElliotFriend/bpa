@@ -11,15 +11,15 @@ function createTransfersStore() {
                 if (store && homeDomain in store) {
                     return {
                         ...store,
-                        [homeDomain]: [...store[homeDomain], transferDetails]
+                        [homeDomain]: [...store[homeDomain], transferDetails],
                     }
                 } else {
                     return {
                         ...store,
-                        [homeDomain]: [transferDetails]
+                        [homeDomain]: [transferDetails],
                     }
                 }
-            })
+            }),
     }
 }
 

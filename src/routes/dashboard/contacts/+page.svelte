@@ -23,7 +23,7 @@
     }
 </script>
 
-<div class="my-10 mx-20">
+<div class="mx-20 my-10">
     <h1 class="text-5xl font-bold">Contacts</h1>
     <p>We'll manage our contacts here</p>
 
@@ -40,7 +40,7 @@
             >favorite?
             <input type="checkbox" class="checkbox" bind:checked={newContact.favorite} />
         </label>
-        <button type="submit" class="btn btn-primary">add contact</button>
+        <button type="submit" class="btn-primary btn">add contact</button>
     </form>
 
     <div class="overflow-x-auto">
@@ -60,10 +60,10 @@
                         <tr>
                             <th>
                                 <div class="form-control">
-                                    <label class="cursor-pointer label">
+                                    <label class="label cursor-pointer">
                                         <input
                                             type="checkbox"
-                                            class="checkbox checkbox-success"
+                                            class="checkbox-success checkbox"
                                             checked={contact.favorite}
                                             on:click={contacts.favorite(contact.id)}
                                         />
@@ -88,14 +88,14 @@
                             <td>{contact.address}</td>
                             <th>
                                 <button
-                                    class="btn btn-square btn-error"
+                                    class="btn-error btn-square btn"
                                     on:click={contacts.remove(contact.id)}
                                 >
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
                                         viewBox="0 0 20 20"
                                         fill="currentColor"
-                                        class="w-5 h-5"
+                                        class="h-5 w-5"
                                     >
                                         <path
                                             fill-rule="evenodd"

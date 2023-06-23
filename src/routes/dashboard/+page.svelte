@@ -5,15 +5,15 @@
     import TransferHistory from './TransferHistory.svelte'
 </script>
 
-<div class="my-10 mx-20">
+<div class="mx-20 my-10">
     <AssetStats />
 </div>
 
-<div class="my-10 mx-20 grid grid-cols-1 xl:grid-cols-2 gap-10">
+<div class="mx-20 my-10 grid grid-cols-1 gap-10 xl:grid-cols-2">
     <RecentPayments />
     <FavoriteContacts />
 </div>
 
-<div class="my-10 mx-20">
+<div class="mx-20 my-10">
     <TransferHistory />
 </div>

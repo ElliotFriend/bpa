@@ -1,5 +1,5 @@
-import { browser } from "$app/environment"
-import { Buffer } from "buffer"
+import { browser } from '$app/environment'
+import { Buffer } from 'buffer'
 
 if (browser) {
     window.Buffer = Buffer

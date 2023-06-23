@@ -6,7 +6,7 @@ export function load() {
         const { keyId, publicKey } = walletStore
         return {
             keyId,
-            publicKey
+            publicKey,
         }
     }
 }

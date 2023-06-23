@@ -10,7 +10,8 @@
     const { close } = getContext('simple-modal')
 
     export let title = 'Transaction Preview'
-    export let body = 'Please confirm the transaction below in order to sign and submit it to the network'
+    export let body =
+        'Please confirm the transaction below in order to sign and submit it to the network'
     export let firstPincode = ''
     export let realTransaction = false
     export let challengeTransaction = false
@@ -19,7 +20,10 @@
 
     let confirmPincode = null
     $: transaction = $modalStore.txXDR
-        ? TransactionBuilder.fromXDR($modalStore.txXDR, $modalStore.challengeNetwork || Networks.TESTNET)
+        ? TransactionBuilder.fromXDR(
+              $modalStore.txXDR,
+              $modalStore.challengeNetwork || Networks.TESTNET
+          )
         : null
 
     import { getContext } from 'svelte'
@@ -33,13 +37,22 @@
                 $modalStore.confirmingPincode = false
                 close()
             } else if (challengeTransaction) {
-                let signedTransaction = await walletStore.sign(transaction, confirmPincode.toString())
-                let token = await submitChallengeTransaction(signedTransaction.toXDR(), challengeHomeDomain)
+                let signedTransaction = await walletStore.sign(
+                    transaction,
+                    confirmPincode.toString()
+                )
+                let token = await submitChallengeTransaction(
+                    signedTransaction.toXDR(),
+                    challengeHomeDomain
+                )
                 webAuthStore.setAuth(challengeHomeDomain, token)
                 $modalStore.confirmPincode = false
                 close()
             } else if (realTransaction && transaction !== null) {
-                let signedTransaction = await walletStore.sign(transaction, confirmPincode.toString())
+                let signedTransaction = await walletStore.sign(
+                    transaction,
+                    confirmPincode.toString()
+                )
                 await submit(signedTransaction)
                 $modalStore.confirmingPincode = false
                 close()
@@ -56,7 +69,6 @@
         $modalStore.errorMessage = 'pincode confirmation rejected'
         close()
     }
-
 </script>
 
 <div class="prose">
@@ -66,24 +78,24 @@
     {/if}
     <p>{body}</p>
     {#if transaction !== null}
-    <h2>Transaction Details</h2>
-    <p>Network: <code>{transaction.networkPassphrase}</code></p>
-    <p>Source: <code>{transaction.source}</code></p>
-    {#if transaction.memo}
-        <p>Memo: <code>{transaction.memo.value}</code></p>
-    {/if}
-    <h2>Operations</h2>
+        <h2>Transaction Details</h2>
+        <p>Network: <code>{transaction.networkPassphrase}</code></p>
+        <p>Source: <code>{transaction.source}</code></p>
+        {#if transaction.memo}
+            <p>Memo: <code>{transaction.memo.value}</code></p>
+        {/if}
+        <h2>Operations</h2>
         <ol>
             {#each transaction.operations as operation, i}
                 <li>Operation {i}</li>
                 <ul>
-                    {#each Object.entries(operation) as [ key, value ]}
+                    {#each Object.entries(operation) as [key, value]}
                         <li>{key}: <code>{value}</code></li>
                     {/each}
                 </ul>
             {/each}
         </ol>
-    <pre><code>{$modalStore.txXDR}</code></pre>
+        <pre><code>{$modalStore.txXDR}</code></pre>
     {/if}
     {#if hasPincodeForm}
         <div class="form-control">
@@ -91,17 +103,19 @@
                 <span class="label-text">Confirm Pincode</span>
             </label>
             <input
-                type="number"
+                type="text"
                 id="confirmPincode"
-                class="input input-bordered"
+                class="input-bordered input"
                 bind:value={confirmPincode}
-                on:keydown={e => e.key === 'Enter' && confirm()}
+                on:keydown={(e) => e.key === 'Enter' && confirm()}
             />
         </div>
-        <button class='btn btn-primary' on:click={confirm} disabled={confirmingSubmitting}>
-            {#if confirmingSubmitting}<span class="loading loading-spinner loading-sm"></span>{/if}
+        <button class="btn-primary btn" on:click={confirm} disabled={confirmingSubmitting}>
+            {#if confirmingSubmitting}<span class="loading loading-spinner loading-sm" />{/if}
             Confirm
         </button>
-        <button class="btn btn-warning" on:click={reject} disabled={confirmingSubmitting}>Reject</button>
+        <button class="btn-warning btn" on:click={reject} disabled={confirmingSubmitting}
+            >Reject</button
+        >
     {/if}
 </div>

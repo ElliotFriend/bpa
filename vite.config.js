@@ -12,20 +12,20 @@ export default defineConfig({
                 global: 'globalThis',
             },
             plugins: [
-				NodeGlobalsPolyfillPlugin({
-					buffer: true,
-				})
-			]
+                NodeGlobalsPolyfillPlugin({
+                    buffer: true,
+                }),
+            ],
         },
     },
     build: {
         rollupOptions: {
-			plugins: [
-				inject({
-					window: path.resolve('src/lib/window.js'),
-				}),
-			]
-		}
+            plugins: [
+                inject({
+                    window: path.resolve('src/lib/window.js'),
+                }),
+            ],
+        },
     },
     ssr: {
         noExternal: ['@stellar/wallet-sdk', '@albedo-link/intent'],

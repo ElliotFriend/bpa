@@ -28,14 +28,18 @@
     }
 
     const signup = () => {
-        open(PinModal,
+        open(
+            PinModal,
             {
                 firstPincode: pincode,
                 hasPincodeForm: true,
                 hasTransaction: false,
-                title: "Confirm Pincode",
-                body: "Please confirm your pincode",
-            }, { /* `svelte-simple-modal` options would go here */ },
+                title: 'Confirm Pincode',
+                body: 'Please confirm your pincode',
+            },
+            {
+                /* `svelte-simple-modal` options would go here */
+            },
             {
                 onOpen: () => {
                     $modalStore.errorMessage = null
@@ -45,9 +49,9 @@
                 },
                 onClose: () => {
                     if ($modalStore.errorMessage) {
-                        errorMessage.set($modalStore.errorMessage)
+                        errorMessage = $modalStore.errorMessage
                     } else if (!$modalStore.confirmingPincode) {
-                        errorMessage.set(null)
+                        errorMessage = null
                         walletStore.register(publicKey, secretKey, pincode)
                     }
                 },
@@ -55,7 +59,7 @@
                     if ($walletStore.publicKey) {
                         goto('/dashboard')
                     }
-                }
+                },
             }
         )
     }
@@ -80,7 +84,7 @@
             {#if errorMessage}
                 <ErrorAlert errorMessage={errorMessage} />
             {/if}
-            <div class="card flex-shrink-0 w-full max-w-sm shadow-2xl bg-base-100">
+            <div class="card w-full max-w-sm flex-shrink-0 bg-base-100 shadow-2xl">
                 <div class="card-body">
                     <div class="form-control">
                         <label for="publicKey" class="label">
@@ -90,12 +94,12 @@
                             type="text"
                             placeholder="G..."
                             id="publicKey"
-                            class="input input-bordered"
+                            class="input-bordered input"
                             bind:value={publicKey}
                             disabled
                         />
                         <label class="label">
-                            <button on:click={newKeypair} class="label-text-alt link link-hover"
+                            <button on:click={newKeypair} class="link-hover label-text-alt link"
                                 >Generate new address?</button
                             >
                         </label>
@@ -115,7 +119,7 @@
                                 type="text"
                                 placeholder="S..."
                                 id="secretKey"
-                                class="input input-bordered"
+                                class="input-bordered input"
                                 bind:value={secretKey}
                                 disabled
                             />
@@ -128,17 +132,17 @@
                         <input
                             type="password"
                             id="pincode"
-                            class="input input-bordered"
+                            class="input-bordered input"
                             bind:value={pincode}
-                            on:keydown={e => e.key === 'Enter' && signup()}
+                            on:keydown={(e) => e.key === 'Enter' && signup()}
                         />
                     </div>
                     <div class="form-control mt-6">
-                        <button on:click={signup} class="btn btn-primary">Signup</button>
+                        <button on:click={signup} class="btn-primary btn">Signup</button>
                     </div>
                     <div class="form-control">
                         <label class="label">
-                            <a class="label-text-alt link link-hover" href="/login"
+                            <a class="link-hover label-text-alt link" href="/login"
                                 >Existing users can login here</a
                             >
                         </label>

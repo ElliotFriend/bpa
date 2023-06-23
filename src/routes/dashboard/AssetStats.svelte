@@ -1,14 +1,14 @@
 <script>
-    import { page } from '$app/stores';
+    import { page } from '$app/stores'
     import { fetchAccount } from '$lib/utils/horizonQueries'
 
     let accountPromise = fetchAccount($page.data.publicKey)
 </script>
 
-<div class="prose mt-2 mb-1">
+<div class="prose mb-1 mt-2">
     <h3>Assets Overview</h3>
 </div>
-<div class="stats bg-primary text-primary-content w-full">
+<div class="stats w-full bg-primary text-primary-content">
     {#await accountPromise}
         <div class="stat">
             <div class="stat-title">Account Balances</div>

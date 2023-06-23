@@ -5,10 +5,6 @@
     import { modal } from '$lib/stores/modalStore'
 </script>
 
-<Modal
-    show={$modal}
-    classContent="rounded bg-base-200"
->
+<Modal show={$modal} classContent="rounded bg-base-200">
     <slot />
 </Modal>
-

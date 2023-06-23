@@ -1,18 +1,15 @@
 import preprocess from 'svelte-preprocess'
-// import adapter from '@sveltejs/adapter-static'
-import adapter from '@sveltejs/adapter-cloudflare'
+// import adapter from '@sveltejs/adapter-auto'
+import adapter from '@sveltejs/adapter-static'
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
     kit: {
         adapter: adapter({
-            routes: {
-                include: ['/*'],
-                exclude: ['<all>'],
-            },
+            fallback: '200.html',
         }),
     },
-
+    prerender: false,
     preprocess: [
         preprocess({
             postcss: true,

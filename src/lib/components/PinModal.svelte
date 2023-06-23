@@ -103,7 +103,7 @@
                 <span class="label-text">Confirm Pincode</span>
             </label>
             <input
-                type="text"
+                type="password"
                 id="confirmPincode"
                 class="input-bordered input"
                 bind:value={confirmPincode}

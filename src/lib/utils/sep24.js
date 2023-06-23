@@ -1,6 +1,6 @@
 import { StellarTomlResolver } from "stellar-sdk";
 
-export async function initiateTransfer(authToken, direction, homeDomain = 'testanchor.stellar.org', assetCode = 'SRT') {
+export async function initiateTransfer(authToken, direction, homeDomain = 'testanchor.stellar.org', urlFields = {}) {
     let { TRANSFER_SERVER_SEP0024 } = await StellarTomlResolver.resolve(homeDomain)
 
     let res = await fetch(`${TRANSFER_SERVER_SEP0024}/transactions/${direction}/interactive`, {
@@ -10,9 +10,7 @@ export async function initiateTransfer(authToken, direction, homeDomain = 'testa
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${authToken}`,
         },
-        body: JSON.stringify({
-            'asset_code': assetCode
-        })
+        body: JSON.stringify(urlFields)
     })
     let json = await res.json()
     return json

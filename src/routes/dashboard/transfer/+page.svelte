@@ -12,7 +12,7 @@
     import { getSep12Fields, putSep12Fields, deleteSep12Customer } from '$lib/utils/sep12'
     import { initiateTransfer, queryTransfers } from '$lib/utils/sep24'
     import { webAuthStore } from '$lib/stores/webAuthStore'
-    import { transfers } from '$lib/stores/transfersStore'
+    // import { transfers } from '$lib/stores/transfersStore'
 
     let homeDomainPromise = async () => {
         return getAccountBalances(publicKey)
@@ -31,12 +31,12 @@
     import ErrorAlert from '$lib/components/ErrorAlert.svelte'
     import { Asset, Memo, Operation } from 'stellar-sdk'
 
-    const transfer = async (direction, homeDomain = 'testanchor.stellar.org') => {
-        let { id, type, url } = await initiateTransfer($webAuthStore[homeDomain], direction, homeDomain)
+    const transfer = async (direction, assetCode, homeDomain = 'testanchor.stellar.org') => {
+        let { id, type, url } = await initiateTransfer($webAuthStore[homeDomain], direction, homeDomain, {asset_code: assetCode, account: publicKey})
         console.log('interactive transfer response', { id, type, url })
         let interactiveUrl = `${url}&callback=postMessage`
         let popup = window.open(interactiveUrl, 'bpaTransferWindow', 'popup')
-        transfers.add(homeDomain, { id, type, url })
+        // transfers.add(homeDomain, { id, type, url })
         window.addEventListener(
             "message",
             async (event) => {
@@ -83,12 +83,13 @@
         )
     }
 
-    const auth = async (homeDomain = 'testanchor.stellar.org') => {
+    const auth = async (homeDomain) => {
+        console.log('homeDomain', homeDomain)
         let { transaction, network_passphrase } = await getChallengeTransaction(publicKey, homeDomain)
         console.log('transaction', transaction)
         $modalStore.txXDR = transaction
         $modalStore.challengeNetwork = network_passphrase
-        let results = await validateChallengeTransaction(transaction, network_passphrase, publicKey)
+        let results = await validateChallengeTransaction(transaction, network_passphrase, publicKey, homeDomain)
         console.log('results in transfer page', results)
         open(PinModal,
             {
@@ -148,12 +149,14 @@
     }
 
     const deleteCustomer = async (homeDomain = 'testanchor.stellar.org') => {
-        let deleteResponse = await deleteSep12Customer($webAuthStore[homeDomain], publicKey)
+        let deleteResponse = await deleteSep12Customer($webAuthStore[homeDomain], publicKey, homeDomain)
         console.log('deleteResponse', deleteResponse)
     }
 
     const launchTransferModal = (homeDomain = 'testanchor.stellar.org') => {
-        open(TransferModal)
+        open(TransferModal, {
+            homeDomain: homeDomain
+        })
     }
 </script>
 
@@ -182,15 +185,15 @@
             <form on:submit|preventDefault={() => deleteCustomer(asset.home_domain)}>
                 <button class="btn" type="submit">DELETE SEP-12 Customer</button>
             </form>
-            <button class="btn" on:click={launchTransferModal}>Launch Transfer Modal</button>
+            <button class="btn" on:click={() => launchTransferModal(asset.home_domain)}>Launch Transfer Modal</button>
             <form on:submit|preventDefault={() => query6(asset.asset_code, asset.home_domain)}>
                 <button class="btn" type="submit">Query SEP-6 Transfers</button>
             </form>
             <p>The following buttons already are working. Don't screw with them!</p>
-            <form on:submit|preventDefault={() => transfer('deposit', asset.home_domain)}>
+            <form on:submit|preventDefault={() => transfer('deposit', asset.asset_code, asset.home_domain)}>
                 <button class="btn btn-primary" type="submit">SEP-24 Deposit</button>
             </form>
-            <form on:submit|preventDefault={() => transfer('withdraw', asset.home_domain)}>
+            <form on:submit|preventDefault={() => transfer('withdraw', asset.asset_code, asset.home_domain)}>
                 <button class="btn btn-primary" type="submit">SEP-24 Withdraw</button>
             </form>
             <form on:submit|preventDefault={() => auth(asset.home_domain)}>

@@ -6,6 +6,7 @@
     import { enhance } from '$app/forms'
     import { getContext } from 'svelte'
     const { open } = getContext('simple-modal')
+    import TruncatedPublicKey from '$lib/components/TruncatedPublicKey.svelte'
 
     /** @type {import('./$types').PageData} */
     export let data
@@ -15,10 +16,13 @@
     $: errorMessage = null
     $: addAsset = null
 
+    let customCode = ''
+    let customIssuer = ''
+
     const previewTransaction = async (adding = true, removeAsset = null) => {
         let transaction = await startTransaction(data.publicKey)
         let asset = adding && addAsset && !removeAsset ? addAsset : removeAsset
-        const assetObj = new Asset(asset.split('-')[0], asset.split('-')[1])
+        const assetObj = asset === 'custom' ? new Asset(customCode, customIssuer) : new Asset(asset.split('-')[0], asset.split('-')[1])
 
         if (adding) {
             transaction.addOperation(
@@ -62,9 +66,9 @@
     }
 </script>
 
-<div class="my-10 mx-20">
-    <h1 class="text-5xl font-bold">Assets</h1>
-    <h2 class="text-3xl font-bold">Add Trusted Assets</h2>
+<div class="prose my-10 mx-20">
+    <h1>Assets</h1>
+    <h2>Add Trusted Assets</h2>
     <form on:submit|preventDefault={previewTransaction}>
         <label for="asset" class="label">
             <span class="label-text">Asset</span>
@@ -76,7 +80,18 @@
             {#each data.assets as { asset }}
                 <option value={asset}>{asset.slice()}</option>
             {/each}
+            <option value="custom">Custom asset...</option>
         </select>
+        {#if addAsset === 'custom'}
+            <div class="join">
+                <div><div>
+                    <input class="input input-bordered join-item" placeholder="Asset Code" bind:value={customCode} />
+                </div></div>
+                <div><div>
+                    <input class="input input-bordered join-item" placeholder="Asset Issuer" bind:value={customIssuer} />
+                </div></div>
+            </div>
+        {/if}
         <button class="btn btn-primary">Add Asset</button>
     </form>
     <h2 class="text-3xl font-bold">Existing Balances</h2>
@@ -100,7 +115,11 @@
                         <tr>
                             <td>{balance.balance}</td>
                             <td>{balance.asset_code ?? 'XLM'}</td>
-                            <td>{balance.asset_issuer ?? 'n/a'}</td>
+                            <td>{#if balance.asset_issuer}
+                                <TruncatedPublicKey publicKey={balance.asset_issuer} />
+                                {:else}
+                                n/a
+                            {/if}</td>
                             <td
                                 >{(
                                     parseFloat(balance.buying_liabilities) +

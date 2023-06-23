@@ -34,7 +34,7 @@
                 close()
             } else if (challengeTransaction) {
                 let signedTransaction = await walletStore.sign(transaction, confirmPincode.toString())
-                let token = await submitChallengeTransaction(signedTransaction.toXDR())
+                let token = await submitChallengeTransaction(signedTransaction.toXDR(), challengeHomeDomain)
                 webAuthStore.setAuth(challengeHomeDomain, token)
                 $modalStore.confirmPincode = false
                 close()

@@ -49,7 +49,7 @@
     const startSep12Fields = async () => {
         // console.log('I just need to see my formData', formData)
 
-        let json = await getSep12Fields($webAuthStore[homeDomain])
+        let json = await getSep12Fields($webAuthStore[homeDomain], homeDomain)
         // console.log('startSep12Fields json', json)
 
         if (json.fields) {
@@ -89,6 +89,7 @@
             .build()
 
         $modalStore.txXDR = transaction.toXDR()
+        close()
         open(PinModal,
             {
                 hasPincodeForm: true,
@@ -110,7 +111,6 @@
                 },
                 onClosed: () => {
                     $modalStore.txXDR = null
-                    close()
                 }
             }
         )
@@ -205,11 +205,11 @@
                                     {/each}
                                 </select>
                             </div>
-                            {#each Object.entries(details[formData.asset_code].types) as [type, typeInfo]}
-                                {#each Object.entries(typeInfo.fields) as [field, fieldInfo]}
-                                    <TransferField {field} {fieldInfo} bind:value={formData[field]} />
+                            {#if formData.type}
+                                {#each Object.entries(details[formData.asset_code].types[formData.type].fields) as [field, fieldInfo]}
+                                        <TransferField {field} {fieldInfo} bind:value={formData[field]} />
                                 {/each}
-                            {/each}
+                            {/if}
                         {/if}
                     {/each}
                     <div class="form-control w-full">
@@ -238,10 +238,10 @@
                                             <span class="label-text-alt">Optional</span>
                                         {/if}
                                     </label>
-                                    {#if details.type === 'string'}
-                                        <input bind:value={$kycStore[field]} class="input input-bordered" type="text" name={field} id={field} required={!details.optional} disabled />
-                                    {:else if details.type === 'binary'}
+                                    {#if details.type === 'binary'}
                                         <input type="file" class="file-input file-input-bordered w-full" disabled />
+                                    {:else}
+                                        <input bind:value={$kycStore[field]} class="input input-bordered" type="text" name={field} id={field} required={!details.optional} disabled />
                                     {/if}
                                 </div>
                             {/each}
@@ -256,10 +256,10 @@
                                 <span class="label-text-alt">Optional</span>
                             {/if}
                         </label>
-                        {#if details.type === 'string'}
-                            <input bind:value={$kycStore[field]} class="input input-bordered" type="text" name={field} id={field} required={!details.optional} />
-                        {:else if details.type === 'binary'}
+                        {#if details.type === 'binary'}
                             <input type="file" class="file-input file-input-bordered w-full" />
+                        {:else}
+                            <input bind:value={$kycStore[field]} class="input input-bordered" type="text" name={field} id={field} required={!details.optional} />
                         {/if}
                     </div>
                 {/each}
@@ -294,7 +294,7 @@
                     </table>
                 </div>
                 {#if transferData.endpoint === 'withdraw'}
-                    <button class="btn btn-primary" on:click={submitPayment(json)}>Send Stellar Payment</button>
+                    <button class="btn btn-primary" on:click={() => submitPayment(json)}>Send Stellar Payment</button>
                 {/if}
             {/await}
         {/if}

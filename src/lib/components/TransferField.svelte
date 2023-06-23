@@ -13,14 +13,14 @@
         {/if}
     </label>
     {#if 'choices' in fieldInfo}
-        <select class="select select-bordered" bind:value={value}>
+        <select class="select select-bordered" name={`transfer-field-${field}`} id={`transfer-field-${field}`} bind:value={value}>
             <option value="" disabled selected>Select one</option>
             {#each fieldInfo.choices as choice}
                 <option>{choice}</option>
             {/each}
         </select>
     {:else}
-        <input type="text" class="input input-bordered" bind:value={value} />
+        <input type="text" class="input input-bordered" name={`transfer-field-${field}`} id={`transfer-field-${field}`} bind:value={value} />
     {/if}
     {#if fieldInfo.description}
         <label class="label" for={`transfer-field-${field}`}>

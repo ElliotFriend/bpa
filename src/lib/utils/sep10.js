@@ -35,6 +35,8 @@ export async function getChallengeTransaction(publicKey, homeDomain = 'testancho
 
 export async function validateChallengeTransaction(transactionXDR, network, clientPublicKey, homeDomain = 'testanchor.stellar.org') {
     const { SIGNING_KEY } = await fetchStellarToml(homeDomain)
+    console.log('another homeDomain', homeDomain)
+    console.log('SIGNING_KEY', SIGNING_KEY)
     try {
         let results = Utils.readChallengeTx(transactionXDR, SIGNING_KEY, network, homeDomain, homeDomain)
         if (results.clientAccountID === clientPublicKey) {

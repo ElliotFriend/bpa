@@ -1,22 +1,21 @@
 <script>
     import { contacts } from '$lib/stores/contactsStore'
-    import { fetchAccount } from '$lib/utils/horizonQueries'
+    import { fetchAccount, getAccountBalances } from '$lib/utils/horizonQueries'
     import PinModal from '$lib/components/PinModal.svelte'
     import { getContext } from 'svelte'
     const { open } = getContext('simple-modal')
     import { modalStore } from '$lib/stores/modalStore'
-    import { startTransaction } from '$lib/utils/horizonQueries'
+    import { startTransaction, findStrictSendPaths, findStrictReceivePaths } from '$lib/utils/horizonQueries'
     import { Operation, Asset, Memo } from 'stellar-sdk'
     import ErrorAlert from '$lib/components/ErrorAlert.svelte'
-    import WarningAlert from '../../../lib/components/WarningAlert.svelte'
+    import WarningAlert from '$lib/components/WarningAlert.svelte'
 
     /** @type {import('./$types').PageData} */
     export let data
 
-    let sourcePublicKey = data.publicKey
-
-    let checkDestinationFunded = (publicKey) =>
+    let checkDestinationFunded = (publicKey) => {
         fetchAccount(publicKey).then((res) => (createAccount = !res.funded))
+    }
 
     let checkDestination = (publicKey) => {
         createAccount = false
@@ -29,15 +28,34 @@
         }
     }
 
+    let findPaths = async () => {
+        if (strictReceive) {
+            let paths = await findStrictReceivePaths(data.publicKey, receiveAsset, receiveAmount)
+        } else {
+            let asset = sendAsset === 'native' ? new Asset.native() : new Asset(sendAsset.split(':')[0], sendAsset.split(':')[1])
+            let paths = await findStrictSendPaths(asset, sendAmount, otherPublicKey || destinationPublicKey)
+            console.log('findPaths paths', paths)
+        }
+    }
+
     let destinationPublicKey = ''
     let otherPublicKey = ''
     let otherDestination = false
-    let createAccount = false
-    let paymentAmount = null
-    let memoText = null
-    let errorMessage = null
+    let createAccount = null
+    let sendAmount = null
+    let sendAsset = 'native'
+    let receiveAmount = null
+    let receiveAsset = 'native'
+    let memoText = ''
+    let errorMessage = ''
+    let pathPayment = false
+    let strictReceive = false
 
     const previewTransaction = async () => {
+        let asset = sendAsset === 'native'
+            ? new Asset.native()
+            : new Asset(sendAsset.split(':')[0], sendAsset.split(':')[1])
+
         let transaction = await startTransaction(data.publicKey)
         if (memoText) {
             transaction.addMemo(Memo.text(memoText))
@@ -47,15 +65,17 @@
             transaction.addOperation(
                 Operation.createAccount({
                     destination: destinationPublicKey,
-                    startingBalance: paymentAmount.toString(),
+                    startingBalance: sendAmount.toString(),
                 })
             )
+        } else if (pathPayment) {
+            // do the pathpayment stuff here!
         } else {
             transaction.addOperation(
                 Operation.payment({
                     destination: destinationPublicKey,
-                    amount: paymentAmount.toString(),
-                    asset: Asset.native(),
+                    amount: sendAmount.toString(),
+                    asset: asset,
                 })
             )
         }
@@ -77,7 +97,7 @@
                 },
                 onClose: () => {
                     if ($modalStore.errorMessage) {
-                        errorMessage = null
+                        errorMessage = $modalStore.errorMessage
                     } else if (!$modalStore.confirmingPincode) {
                         errorMessage = null
                     }
@@ -90,19 +110,16 @@
     }
 </script>
 
-<div class="prose mx-20 my-10">
+<div class="prose dark:prose-invert mx-20 my-10 max-w-full">
     <h1>Send a Payment</h1>
-    <p>This is where you'll be able to send a payment</p>
-
-    <p>Confirming: <code>{$modalStore.confirmingPincode}</code></p>
+    <p>Please complete the fields below to send a payment on the Stellar network.</p>
 
     {#if errorMessage}
         <ErrorAlert errorMessage={errorMessage} />
     {/if}
 
     <form on:submit|preventDefault={previewTransaction}>
-        <input type="hidden" id="source" name="source" value={sourcePublicKey} />
-        <div class="form-control w-full max-w-xs">
+        <div class="form-control">
             <label for="destination" class="label">
                 <span class="label-text">Destination</span>
             </label>
@@ -114,11 +131,9 @@
                 on:change={checkDestination(destinationPublicKey)}
             >
                 <option value="" disabled selected>Select Recipient</option>
-                {#if contacts}
-                    {#each $contacts as contact (contact.id)}
-                        <option value={contact.address}>{contact.name}</option>
-                    {/each}
-                {/if}
+                {#each $contacts as contact (contact.id)}
+                    <option value={contact.address}>{contact.name}</option>
+                {/each}
                 <option value="other">Other...</option>
             </select>
         </div>
@@ -145,32 +160,112 @@
             <code>creatAccount</code> operation, and the amount you send must be at least 1XLM."
             />
         {/if}
+        {#if createAccount !== null && !createAccount}
         <div class="form-control">
-            <label for="amount" class="label">
-                <span class="label-text">Amount</span>
-            </label>
-            <label class="input-group">
-                <input
-                    id="amount"
-                    name="amount"
-                    type="text"
-                    placeholder="0.01"
-                    class="input-bordered input"
-                    bind:value={paymentAmount}
-                />
-                <span>XLM</span>
+            <label class="label cursor-pointer">
+                <span class="label-text">Send and Receive different assets?</span>
+                <input type="checkbox" class="toggle" bind:checked={pathPayment} />
             </label>
         </div>
+        {/if}
+        {#if pathPayment}
+            <div class="flex w-full">
+                <div class="grid flex-grow">
+                    <h3>Sending</h3>
+                    <div class="form-control w-full">
+                        <label for="sendAmount" class="label">
+                            <span class="label-text">Sending Amount and Asset {strictReceive ? '(estimated)' : ''}</span>
+                        </label>
+                        <div class="join">
+                            <div class="grow">
+                                <div>
+                                    <input on:change={findPaths} disabled={strictReceive} id="sendAmount" name="sendAmount" class="w-full input input-bordered join-item" placeholder="0.01" type="text" bind:value={sendAmount} />
+                                </div>
+                            </div>
+                            <select class="select select-bordered join-item" bind:value={sendAsset}>
+                                <option value="" disabled>Select one</option>
+                                <option value="native">XLM</option>
+                                {#await getAccountBalances(data.publicKey) then balances}
+                                    {#each balances as balance}
+                                        {#if balance.asset_type !== 'native'}
+                                            <option value={`${balance.asset_code}:${balance.asset_issuer}`}>{balance.asset_code}</option>
+                                        {/if}
+                                    {/each}
+                                {/await}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="divider divider-horizontal w-20 mx-5">
+                    Strict {strictReceive ? 'Receive' : 'Send'}
+                    <input type="checkbox" class="toggle" bind:checked={strictReceive} />
+                </div>
+                <div class="grid flex-grow">
+                    <h3>Receiving</h3>
+                    <div class="form-control w-full">
+                        <label for="receiveAmount" class="label">
+                            <span class="label-text">Receiving Amount and Asset {!strictReceive ? '(estimated)' : ''}</span>
+                        </label>
+                        <div class="join">
+                            <div class="grow">
+                                <div>
+                                    <input disabled={!strictReceive} id="receiveAmount" name="receiveAmount" class="w-full input input-bordered join-item" placeholder="0.01" type="text" bind:value={receiveAmount} />
+                                </div>
+                            </div>
+                            <select class="select select-bordered join-item" bind:value={receiveAsset}>
+                                <option value="" disabled>Select one</option>
+                                <option value="native">XLM</option>
+                                {#if otherPublicKey || destinationPublicKey}
+                                    {#await getAccountBalances(otherPublicKey || destinationPublicKey) then balances}
+                                        {#each balances as balance}
+                                            {#if balance.asset_type !== 'native'}
+                                                <option value={`${balance.asset_code}:${balance.asset_issuer}`}>{balance.asset_code}</option>
+                                            {/if}
+                                        {/each}
+                                    {/await}
+                                {/if}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {:else}
+            <div class="form-control max-w-full">
+                <label for="amount" class="label">
+                    <span class="label-text">Amount</span>
+                </label>
+                <div class="join">
+                    <div class="grow">
+                        <div>
+                            <input id="amount" name="amount" class="w-full input input-bordered join-item" placeholder="0.01" type="text" bind:value={sendAmount} />
+                        </div>
+                    </div>
+                    <select class="select select-bordered join-item">
+                        <option value="" disabled>Select one</option>
+                        <option value="native">XLM</option>
+                        {#await getAccountBalances(data.publicKey) then balances}
+                            {#each balances as balance}
+                                {#if balance.asset_type !== 'native'}
+                                    <option value={`${balance.asset_code}:${balance.asset_issuer}`}>{balance.asset_code}</option>
+                                {/if}
+                            {/each}
+                        {/await}
+                    </select>
+                </div>
+            </div>
+        {/if}
         <div class="form-control">
             <label for="memo" class="label">
-                <span class="label-text">Memo</span>
+                <span class="label-text">Text Memo</span>
+                <span class="label-text-alt">Optional</span>
             </label>
             <input
                 id="memo"
                 name="memo"
                 type="text"
-                placeholder="Optional"
+                placeholder="Maximum 28 characters"
                 class="input-bordered input"
+                maxlength="28"
                 bind:value={memoText}
             />
         </div>

@@ -61,13 +61,18 @@ export async function submit(transaction) {
     try {
         console.log('transaciton received in submit fn', transaction)
         const res = await server.submitTransaction(transaction)
+        console.log('submission response', res)
         return {
             success: true,
             hash: res.hash,
         }
     } catch (err) {
-        console.log('error in transaction submit', err)
-        throw error(400, err)
+        console.error('error in transaction submit', err)
+        // throw error(400, err)
+        throw error(400, {
+            message: err.response.data.title,
+            result_codes: err.response.data.extras.result_codes
+        })
     }
 }
 
@@ -106,4 +111,26 @@ export async function getBalanceHomeDomains(balances) {
     )
 
     return homeDomains.filter((balance) => balance)
+}
+
+export async function findStrictSendPaths(sourceAsset, sourceAmount, destinationPublicKey) {
+    try {
+        let response = await server.strictSendPaths(sourceAsset, sourceAmount, destinationPublicKey).call()
+        console.log('here are the paths', response)
+        return response.records
+    } catch (err) {
+        console.error('error finding strictSend payment paths', err)
+        throw error(400, err)
+    }
+}
+
+export async function findStrictReceivePaths(sourcePublicKey, destinationAsset, destinationAmount) {
+    try {
+        let response = await server.strictReceivePaths(sourcePublicKey, destinationAsset, destinationAmount).call()
+        console.log('here are the paths', response)
+        return response.records
+    } catch (err) {
+        console.error('error finding strictRecieve payment paths', err)
+        throw error(400, err)
+    }
 }

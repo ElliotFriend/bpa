@@ -1,9 +1,9 @@
 <script>
     import { Asset, Operation } from 'stellar-sdk'
     import { getAccountBalances, startTransaction } from '$lib/utils/horizonQueries'
+    import { fetchAssets } from '$lib/utils/stellarExpert'
     import { modalStore } from '$lib/stores/modalStore'
     import PinModal from '$lib/components/PinModal.svelte'
-    import { enhance } from '$app/forms'
     import { getContext } from 'svelte'
     const { open } = getContext('simple-modal')
     import TruncatedPublicKey from '$lib/components/TruncatedPublicKey.svelte'
@@ -91,9 +91,11 @@
             <option value="USDC-GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5"
                 >testanchor USDC-GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5</option
             >
-            {#each data.assets as { asset }}
-                <option value={asset}>{asset.slice()}</option>
-            {/each}
+            {#await fetchAssets() then assets}
+                {#each assets as { asset }}
+                    <option value={asset}>{asset.slice()}</option>
+                {/each}
+            {/await}
             <option value="custom">Custom asset...</option>
         </select>
         {#if addAsset === 'custom'}

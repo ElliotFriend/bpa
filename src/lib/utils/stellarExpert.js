@@ -12,6 +12,7 @@ export async function fetchAssets() {
             cursor: 0,
         })}`
     )
+
     let json = await res.json()
     return json._embedded.records
 }

@@ -59,7 +59,7 @@
             }
         } catch (err) {
             console.error('transaction confirmation error', err)
-            $modalStore.errorMessage = err.body.message
+            $modalStore.errorMessage = `${err.body.message}. ${err.body.result_codes ? `extra result_codes: <code>${JSON.stringify(err.body.result_codes)}</code>` : ""}`
         }
         confirmingSubmitting = false
     }
@@ -71,7 +71,7 @@
     }
 </script>
 
-<div class="prose">
+<div class="prose dark:prose-invert">
     <h1>{title}</h1>
     {#if $modalStore.errorMessage}
         <ErrorAlert errorMessage={$modalStore.errorMessage} />
@@ -81,6 +81,7 @@
         <h2>Transaction Details</h2>
         <p>Network: <code>{transaction.networkPassphrase}</code></p>
         <p>Source: <code>{transaction.source}</code></p>
+        <p>Sequence Number: <code>{transaction.sequence}</code></p>
         {#if transaction.memo}
             <p>Memo: <code>{transaction.memo.value}</code></p>
         {/if}

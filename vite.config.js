@@ -5,7 +5,9 @@ import inject from '@rollup/plugin-inject'
 import path from 'path'
 
 export default defineConfig({
-    plugins: [sveltekit()],
+    plugins: [
+        sveltekit()
+    ],
     optimizeDeps: {
         esbuildOptions: {
             define: {

@@ -3,16 +3,13 @@
     import { fetchRecentPayments } from '$lib/utils/horizonQueries'
     import TruncatedPublicKey from '$lib/components/TruncatedPublicKey.svelte'
     let publicKey = $page.data.publicKey
-    let paymentsPromise = fetchRecentPayments(publicKey)
 </script>
 
 <div class="overflow-x-auto">
     <div class="prose mb-1">
         <h3>Recent Payments</h3>
     </div>
-    {#await paymentsPromise}
-        <p>Loading payments history...</p>
-    {:then payments}
+    {#await fetchRecentPayments(publicKey) then payments}
         <table class="table">
             <thead>
                 <tr>
@@ -66,6 +63,6 @@
             </tbody>
         </table>
     {:catch error}
-        <p>something went wrong... {error.toString()}</p>
+        <p>Could not fetch recent payments: {error.toString()}</p>
     {/await}
 </div>

@@ -21,9 +21,7 @@
     <div class="prose mb-1">
         <h3>Transfer History</h3>
     </div>
-    {#await transfersPromise()}
-        <p>loading transfers...</p>
-    {:then transfers}
+    {#await transfersPromise() then transfers}
         <table class="table-compact table w-full table-auto">
             <thead>
                 <tr>

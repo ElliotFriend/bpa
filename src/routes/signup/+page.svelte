@@ -11,6 +11,7 @@
     import PinModal from '$lib/components/PinModal.svelte'
     import ErrorAlert from '$lib/components/ErrorAlert.svelte'
     import { modalStore } from '$lib/stores/modalStore'
+    import { fundWithFriendbot } from '$lib/utils/horizonQueries'
 
     let keypair = null
     let publicKey = null
@@ -47,15 +48,16 @@
                 onOpened: () => {
                     $modalStore.confirmingPincode = true
                 },
-                onClose: () => {
+                onClose: async () => {
                     if ($modalStore.errorMessage) {
                         errorMessage = $modalStore.errorMessage
                     } else if (!$modalStore.confirmingPincode) {
                         errorMessage = null
-                        walletStore.register(publicKey, secretKey, pincode)
+                        await walletStore.register(publicKey, secretKey, pincode)
+                        await fundWithFriendbot($walletStore.publicKey)
                     }
                 },
-                onClosed: () => {
+                onClosed: async () => {
                     if ($walletStore.publicKey) {
                         goto('/dashboard')
                     }

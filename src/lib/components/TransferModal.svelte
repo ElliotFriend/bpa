@@ -16,6 +16,7 @@
     import { startTransaction } from '$lib/utils/horizonQueries'
 
     import PinModal from '$lib/components/PinModal.svelte'
+    import LoadingSpinner from '$lib/components/LoadingSpinner.svelte'
     import { getContext } from 'svelte'
     import { Asset, Memo, Operation } from 'stellar-sdk'
     const { open, close } = getContext('simple-modal')
@@ -159,7 +160,7 @@
     export let homeDomain = 'testanchor.stellar.org'
 </script>
 
-<div class="prose">
+<div class="prose dark:prose-invert">
     <h1>{title}</h1>
     {#if $modalStore.errorMessage}
         <ErrorAlert errorMessage={$modalStore.errorMessage} />
@@ -170,7 +171,7 @@
         {#if activeStep === 'Transfer Details'}
             <p>Let's begin by deciding what kind of transfer we want to make.</p>
             {#await getSep6Info(homeDomain)}
-                <p>loading...</p>
+                <LoadingSpinner />
             {:then info}
                 <div class="form-control w-full">
                     <label class="label" for="endpoint-select">

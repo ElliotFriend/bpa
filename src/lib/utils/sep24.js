@@ -1,4 +1,5 @@
 import { getTransferServerSep24 } from "$lib/utils/sep1"
+import { error } from '@sveltejs/kit'
 
 export async function initiateTransfer(
     authToken,
@@ -36,6 +37,14 @@ export async function queryTransfers(authToken, assetCode, homeDomain) {
             },
         }
     )
+
     let json = await res.json()
-    return json
+
+    if (!res.ok) {
+        throw error(res.status, {
+            message: json.error
+        })
+    } else {
+        return json
+    }
 }

@@ -1,19 +1,27 @@
 <script>
     import { webAuthStore } from '$lib/stores/webAuthStore'
     import { queryTransfers } from '$lib/utils/sep24'
+    import { error } from '@sveltejs/kit'
 
     const transfersPromise = async () => {
-        let allTransfers = []
-        for (const homeDomain in $webAuthStore) {
-            let { transactions } = await queryTransfers(
-                $webAuthStore[homeDomain],
-                'SRT',
-                homeDomain
-            )
-            allTransfers.push(...transactions)
+        try {
+            let allTransfers = []
+            for (const homeDomain in $webAuthStore) {
+                let { transactions } = await queryTransfers(
+                    $webAuthStore[homeDomain],
+                    'SRT',
+                    homeDomain
+                )
+                allTransfers.push(...transactions)
+            }
+            // console.log(allTransfers)
+            return allTransfers
+        } catch (err) {
+            console.log('the error', err)
+            throw error(400, {
+                message: "here is your stupid message"
+            })
         }
-        // console.log(allTransfers)
-        return allTransfers
     }
 </script>
 
@@ -64,5 +72,7 @@
                 {/each}
             </tbody>
         </table>
+    {:catch err}
+        <p>Here is an error: {err}</p>
     {/await}
 </div>

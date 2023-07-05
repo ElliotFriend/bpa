@@ -87,7 +87,9 @@
                 hasPincodeForm: true,
                 realTransaction: true,
             },
-            {},
+            {
+                /* `svelte-simple-modal` options would go here */
+            },
             {
                 onOpen: () => {
                     $modalStore.errorMessage = null

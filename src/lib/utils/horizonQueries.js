@@ -86,7 +86,8 @@ export async function getAccountBalances(publicKey) {
 export async function fundWithFriendbot(publicKey) {
     if (validPublicKey(publicKey)) {
         const friendbotUrl = `https://friendbot.stellar.org?addr=${publicKey}`
-        await fetch(friendbotUrl)
+        let unused = await fetch(friendbotUrl)
+        return
     }
 }
 

@@ -1,9 +1,6 @@
-import { StellarTomlResolver, Utils } from 'stellar-sdk'
+import { Utils } from 'stellar-sdk'
+import { fetchStellarToml, getServerSigningKey, getWebAuthEndpoint } from '$lib/utils/sep1'
 import { error } from '@sveltejs/kit'
-
-export async function fetchStellarToml(homeDomain = 'testanchor.stellar.org') {
-    return StellarTomlResolver.resolve(homeDomain)
-}
 
 export async function getSep10Domains(balances) {
     let sep10Domains = await Promise.all(
@@ -20,10 +17,11 @@ export async function getSep10Domains(balances) {
     return sep10Domains.filter((balance) => balance)
 }
 
-export async function getChallengeTransaction(publicKey, homeDomain = 'testanchor.stellar.org') {
-    let { WEB_AUTH_ENDPOINT } = await fetchStellarToml(homeDomain)
+export async function getChallengeTransaction(publicKey, homeDomain) {
+    let webAuthEndpoint = await getWebAuthEndpoint(homeDomain)
+
     let res = await fetch(
-        `${WEB_AUTH_ENDPOINT}?${new URLSearchParams({
+        `${webAuthEndpoint}?${new URLSearchParams({
             // possible parameters are `account`, `memo`, `home_domain`, and `client_domain`
             // for our purposes, we only need to supply an `account`
             account: publicKey,
@@ -37,15 +35,14 @@ export async function validateChallengeTransaction(
     transactionXDR,
     network,
     clientPublicKey,
-    homeDomain = 'testanchor.stellar.org'
+    homeDomain
 ) {
-    const { SIGNING_KEY } = await fetchStellarToml(homeDomain)
-    console.log('another homeDomain', homeDomain)
-    console.log('SIGNING_KEY', SIGNING_KEY)
+    let serverSigningKey = await getServerSigningKey(homeDomain)
+
     try {
         let results = Utils.readChallengeTx(
             transactionXDR,
-            SIGNING_KEY,
+            serverSigningKey,
             network,
             homeDomain,
             homeDomain
@@ -62,10 +59,10 @@ export async function validateChallengeTransaction(
 
 export async function submitChallengeTransaction(
     transactionXDR,
-    homeDomain = 'testanchor.stellar.org'
+    homeDomain
 ) {
-    let { WEB_AUTH_ENDPOINT } = await fetchStellarToml(homeDomain)
-    let res = await fetch(WEB_AUTH_ENDPOINT, {
+    let webAuthEndpoint = await getWebAuthEndpoint(homeDomain)
+    let res = await fetch(webAuthEndpoint, {
         method: 'POST',
         mode: 'cors',
         headers: { 'Content-Type': 'application/json' },
@@ -76,4 +73,8 @@ export async function submitChallengeTransaction(
         throw error(400, json.error)
     }
     return json.token
+}
+
+export function validateAuthToken(authToken) {
+    return
 }

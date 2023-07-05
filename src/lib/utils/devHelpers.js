@@ -1,8 +1,8 @@
 import { startTransaction, submit, fundWithFriendbot } from '$lib/utils/horizonQueries'
-import { Server, Operation, Asset, Keypair } from 'stellar-sdk'
+import { Operation, Asset, Keypair } from 'stellar-sdk'
 
 export async function addContactTrustlines(keypair, assets) {
-    let server = new Server('https://horizon-testnet.stellar.org')
+    // let server = new Server('https://horizon-testnet.stellar.org')
     let transaction = await startTransaction(keypair.publicKey())
     transaction.addOperation(
         Operation.changeTrust({
@@ -21,7 +21,7 @@ export async function addContactTrustlines(keypair, assets) {
     transaction = transaction.setTimeout(30).build()
     transaction.sign(keypair)
 
-    return await server.submitTransaction(transaction)
+    return await submit(transaction)
 }
 
 export async function mergeFriendbotAccount(publicKey) {
@@ -38,5 +38,5 @@ export async function mergeFriendbotAccount(publicKey) {
         .build()
 
     transaction.sign(kp)
-    return await submitTransaction(transaction)
+    return await submit(transaction)
 }

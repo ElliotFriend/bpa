@@ -1,11 +1,9 @@
-import { StellarTomlResolver } from 'stellar-sdk'
+import { getKycServer } from "$lib/utils/sep1"
 
-// TODO: Make it so that anchors without a `KYC_SERVER` toml entry will use the anchor's `TRANSFER_SERVER` instead.
+export async function getSep12Fields(authToken, homeDomain) {
+    let kycServer = await getKycServer(homeDomain)
 
-export async function getSep12Fields(authToken, homeDomain = 'testanchor.stellar.org') {
-    let { KYC_SERVER } = await StellarTomlResolver.resolve(homeDomain)
-
-    let res = await fetch(`${KYC_SERVER}/customer`, {
+    let res = await fetch(`${kycServer}/customer`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -19,10 +17,10 @@ export async function getSep12Fields(authToken, homeDomain = 'testanchor.stellar
     return json
 }
 
-export async function putSep12Fields(authToken, fields, homeDomain = 'testanchor.stellar.org') {
-    let { KYC_SERVER } = await StellarTomlResolver.resolve(homeDomain)
+export async function putSep12Fields(authToken, fields, homeDomain) {
+    let kycServer = await getKycServer(homeDomain)
 
-    let res = await fetch(`${KYC_SERVER}/customer`, {
+    let res = await fetch(`${kycServer}/customer`, {
         method: 'PUT',
         mode: 'cors',
         headers: {
@@ -40,11 +38,11 @@ export async function putSep12Fields(authToken, fields, homeDomain = 'testanchor
 export async function deleteSep12Customer(
     authToken,
     publicKey,
-    homeDomain = 'testanchor.stellar.org'
+    homeDomain
 ) {
-    let { KYC_SERVER } = await StellarTomlResolver.resolve(homeDomain)
+    let kycServer = await getKycServer(homeDomain)
 
-    let res = await fetch(`${KYC_SERVER}/customer/${publicKey}`, {
+    let res = await fetch(`${kycServer}/customer/${publicKey}`, {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',

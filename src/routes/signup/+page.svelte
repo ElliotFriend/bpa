@@ -33,8 +33,7 @@
             PinModal,
             {
                 firstPincode: pincode,
-                hasPincodeForm: true,
-                hasTransaction: false,
+                publicKey: publicKey,
                 title: 'Confirm Pincode',
                 body: 'Please confirm your pincode',
             },
@@ -48,13 +47,13 @@
                 onOpened: () => {
                     $modalStore.confirmingPincode = true
                 },
-                onClose: async () => {
+                onClose: () => {
                     if ($modalStore.errorMessage) {
                         errorMessage = $modalStore.errorMessage
+                        console.log('routes/signup/+page.svelte errorMessage', errorMessage)
                     } else if (!$modalStore.confirmingPincode) {
                         errorMessage = null
-                        await walletStore.register(publicKey, secretKey, pincode)
-                        await fundWithFriendbot($walletStore.publicKey)
+                        walletStore.register(publicKey, secretKey, pincode)
                     }
                 },
                 onClosed: async () => {

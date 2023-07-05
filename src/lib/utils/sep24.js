@@ -1,14 +1,14 @@
-import { StellarTomlResolver } from 'stellar-sdk'
+import { getTransferServerSep24 } from "$lib/utils/sep1"
 
 export async function initiateTransfer(
     authToken,
     direction,
-    homeDomain = 'testanchor.stellar.org',
+    homeDomain,
     urlFields = {}
 ) {
-    let { TRANSFER_SERVER_SEP0024 } = await StellarTomlResolver.resolve(homeDomain)
+    let transferServerSep24 = await getTransferServerSep24(homeDomain)
 
-    let res = await fetch(`${TRANSFER_SERVER_SEP0024}/transactions/${direction}/interactive`, {
+    let res = await fetch(`${transferServerSep24}/transactions/${direction}/interactive`, {
         method: 'POST',
         mode: 'cors',
         headers: {
@@ -21,11 +21,11 @@ export async function initiateTransfer(
     return json
 }
 
-export async function queryTransfers(authToken, assetCode, homeDomain = 'testanchor.stellar.org') {
-    let { TRANSFER_SERVER_SEP0024 } = await StellarTomlResolver.resolve(homeDomain)
+export async function queryTransfers(authToken, assetCode, homeDomain) {
+    let transferServerSep24 = await getTransferServerSep24(homeDomain)
 
     let res = await fetch(
-        `${TRANSFER_SERVER_SEP0024}/transactions?${new URLSearchParams({
+        `${transferServerSep24}/transactions?${new URLSearchParams({
             asset_code: assetCode,
         })}`,
         {

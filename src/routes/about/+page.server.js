@@ -2,8 +2,7 @@ import { Server } from 'stellar-sdk'
 
 export async function load() {
     const server = new Server('https://horizon-testnet.stellar.org')
-    let response = await server.assets().limit(200).order('desc').call()
-    let records = response.records
+    let { records } = await server.assets().limit(200).order('desc').call()
 
     return {
         num_records: records.length,

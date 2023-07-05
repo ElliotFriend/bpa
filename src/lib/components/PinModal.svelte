@@ -3,7 +3,7 @@
     import { walletStore, confirmCorrectPincode } from '$lib/stores/walletStore'
     import { webAuthStore } from '$lib/stores/webAuthStore'
     import { TransactionBuilder, Networks } from 'stellar-sdk'
-    import { submit } from '$lib/utils/horizonQueries'
+    import { submit, fundWithFriendbot } from '$lib/utils/horizonQueries'
     import { submitChallengeTransaction } from '$lib/utils/sep10'
     import ErrorAlert from '$lib/components/ErrorAlert.svelte'
 
@@ -13,10 +13,11 @@
     export let body =
         'Please confirm the transaction below in order to sign and submit it to the network'
     export let firstPincode = ''
+    export let publicKey = ''
     export let realTransaction = false
     export let challengeTransaction = false
     export let challengeHomeDomain = ''
-    export let hasPincodeForm = false
+    export let hasPincodeForm = true
 
     let confirmPincode = null
     $: transaction = $modalStore.txXDR
@@ -35,6 +36,7 @@
             if (firstPincode) {
                 confirmCorrectPincode(firstPincode, confirmPincode, true)
                 $modalStore.confirmingPincode = false
+                await fundWithFriendbot(publicKey)
                 close()
             } else if (challengeTransaction) {
                 let signedTransaction = await walletStore.sign(
@@ -71,22 +73,29 @@
     }
 </script>
 
-<div class="prose dark:prose-invert">
+<div class="prose dark:prose-invert min-w-0">
     <h1>{title}</h1>
     {#if $modalStore.errorMessage}
         <ErrorAlert errorMessage={$modalStore.errorMessage} />
     {/if}
     <p>{body}</p>
     {#if transaction !== null}
+        {console.log('PinModal transaction', transaction)}
         <h2>Transaction Details</h2>
         <p>Network: <code>{transaction.networkPassphrase}</code></p>
         <p>Source: <code>{transaction.source}</code></p>
         <p>Sequence Number: <code>{transaction.sequence}</code></p>
         {#if transaction.memo}
-            <p>Memo: <code>{transaction.memo.value}</code></p>
+            <p>Memo ({transaction.memo.type}): <code>{
+                transaction.memo.type === 'text'
+                ? transaction.memo.value.toString('utf-8')
+                : transaction.memo.type === 'hash'
+                ? transaction.memo.value.toString('base64')
+                : transaction.memo.value
+            }</code></p>
         {/if}
         <h2>Operations</h2>
-        <ol>
+        <ol start="0">
             {#each transaction.operations as operation, i}
                 <li>Operation {i}</li>
                 <ul>
@@ -96,7 +105,10 @@
                 </ul>
             {/each}
         </ol>
-        <pre><code>{$modalStore.txXDR}</code></pre>
+        <h2>Transaction XDR</h2>
+        <p>Below, the entire (unsigned) transaction is displayed in XDR format. You can confirm the details of it by checking the "View XDR" page of the <a href="https://laboratory.stellar.org/#xdr-viewer?type=TransactionEnvelope&network=test" target="_blank" rel="noopener, noreferrer">Stellar Laboratory</a>.</p>
+        <pre class="whitespace-normal break-words">{$modalStore.txXDR}</pre>
+        <pre>Here is a <code>pre</code> element</pre>
     {/if}
     {#if hasPincodeForm}
         <div class="form-control">

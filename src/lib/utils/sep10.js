@@ -17,38 +17,68 @@ export async function getSep10Domains(balances) {
     return sep10Domains.filter((balance) => balance)
 }
 
-export async function getChallengeTransaction(publicKey, homeDomain) {
-    let webAuthEndpoint = await getWebAuthEndpoint(homeDomain)
+/**
+ * Requests, validates, and returns a SEP-10 challenge transaction and the corresponding network passphrase from an anchor server.
+ * @param {string} publicKey - Public stellar address the challenge transaction will be generated for
+ * @param {string} domain - Domain to request a challenge transaction from
+ * @returns {Promise<Object>} - Object containing the XDR representation of a challenge transaction, and a network passphrase
+ */
+export async function getChallengeTransaction(publicKey, domain) {
+    // let webAuthEndpoint = await getWebAuthEndpoint(domain)
+    let { WEB_AUTH_ENDPOINT, SIGNING_KEY, NETWORK_PASSPHRASE } = await fetchStellarToml(domain)
 
     let res = await fetch(
-        `${webAuthEndpoint}?${new URLSearchParams({
-            // possible parameters are `account`, `memo`, `home_domain`, and `client_domain`
-            // for our purposes, we only need to supply an `account`
+        `${WEB_AUTH_ENDPOINT}?${new URLSearchParams({
+            // Possible parameters are `account`, `memo`, `home_domain`, and
+            // `client_domain`. For our purposes, we only supply an `account`.
             account: publicKey,
         })}`
     )
     let json = await res.json()
+
+    validateChallengeTransaction({
+        transactionXDR: json.transaction,
+        serverSigningKey: SIGNING_KEY,
+        network: NETWORK_PASSPHRASE,
+        clientPublicKey: publicKey,
+        homeDomain: domain
+    })
     return json
 }
 
-export async function validateChallengeTransaction(
+/**
+ * Validates the correct structure and information in a SEP-10 challenge transaction.
+ * @param {Object} opts - Options object
+ * @param {string} opts.transactionXDR - Challenge transaction encoded in base64 XDR format
+ * @param {string} opts.serverSigningKey - Public Stellar address the anchor should use to sign the challenge transaction
+ * @param {string} opts.network - Network passphrase the challenge transaction is expected to be built for
+ * @param {string} opts.clientPublicKey - Public Stellar address of the client authenticating with the anchor
+ * @param {string} opts.homeDomain - Domain of the anchor that generated the challenge transaction
+ * @param {string} [opts.clientDomain=opts.homeDomain] - Used for client domain verification in the SEP-10 authentication flow
+ * @throws {error} Will throw an error if any part of the challenge transaction doesn't match the SEP-10 specification
+ */
+function validateChallengeTransaction({
     transactionXDR,
+    serverSigningKey,
     network,
     clientPublicKey,
-    homeDomain
-) {
-    let serverSigningKey = await getServerSigningKey(homeDomain)
+    homeDomain,
+    clientDomain
+}) {
 
+    if (!clientDomain) {
+        clientDomain = homeDomain
+    }
     try {
         let results = Utils.readChallengeTx(
             transactionXDR,
             serverSigningKey,
             network,
             homeDomain,
-            homeDomain
+            clientDomain
         )
         if (results.clientAccountID === clientPublicKey) {
-            return results
+            return
         } else {
             throw error(400, 'clientAccountID does not match challenge transaction')
         }

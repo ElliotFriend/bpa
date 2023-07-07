@@ -31,7 +31,7 @@
     import TransferModal from '$lib/components/TransferModal.svelte'
     import { getContext } from 'svelte'
     const { open } = getContext('simple-modal')
-    import { getChallengeTransaction, validateChallengeTransaction } from '$lib/utils/sep10'
+    import { getChallengeTransaction } from '$lib/utils/sep10'
     import ErrorAlert from '$lib/components/ErrorAlert.svelte'
     import { Asset, Memo, Operation } from 'stellar-sdk'
 
@@ -114,13 +114,13 @@
         console.log('transaction', transaction)
         $modalStore.txXDR = transaction
         $modalStore.challengeNetwork = network_passphrase
-        let results = await validateChallengeTransaction(
-            transaction,
-            network_passphrase,
-            publicKey,
-            homeDomain
-        )
-        console.log('results in transfer page', results)
+        // let results = await validateChallengeTransaction(
+        //     transaction,
+        //     network_passphrase,
+        //     publicKey,
+        //     homeDomain
+        // )
+        // console.log('results in transfer page', results)
         open(
             PinModal,
             {

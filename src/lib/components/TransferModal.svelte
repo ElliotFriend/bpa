@@ -64,11 +64,11 @@
     const submitTransfer = async () => {
         // we have an id, so initiate the real transfer, right?
         if (transferData.transfer_submitted) {
-            let transaction = await getTransferStatus6(
-                $webAuthStore[homeDomain],
-                transferData.transfer_id,
-                homeDomain
-            )
+            let transaction = await getTransferStatus6({
+                authToken: $webAuthStore[homeDomain],
+                transferId: transferData.transfer_id,
+                domain: homeDomain,
+            })
             return transaction
         } else {
             let json = await initiateTransfer6(

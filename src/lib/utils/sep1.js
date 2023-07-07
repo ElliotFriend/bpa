@@ -1,5 +1,7 @@
 import { StellarTomlResolver } from 'stellar-sdk'
 
+/** @module $lib/utils/sep1 */
+
 /**
  * Fetches and returns the stellar.toml file hosted by a provided domain.
  * @param {string} domain - Domain to get the stellar.toml file for

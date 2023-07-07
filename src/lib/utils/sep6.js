@@ -5,7 +5,7 @@ import { getTransferServerSep6 } from "$lib/utils/sep1"
 /**
  * Initiates a transfer using the SEP-6 protocol.
  * @param {string} authToken - Authentication token for a Stellar account received through SEP-10 web authentication
- * @param {('deposit'|'withdraw')} endpoint - URL endpoint to be requested, also indicates which direction the transfer is moving
+ * @param {string} endpoint - URL endpoint to be requested, also indicates which direction the transfer is moving
  * @param {Object} formData - Big ol' object that should be done better, but it's pretty much ALL the
  * @param {string} domain - Domain of the anchor that is handling the transfer
  * @returns {Promise<Object>} - JSON response from the server
@@ -47,27 +47,24 @@ export async function getSep6Info(domain) {
 
 /**
  * Queries and returns information about an individual transfer.
- * @param {string} authToken - Authentication token for a Stellar account received through SEP-10 web authentication
- * @param {string} transferId - Unique ID of the transfer we want to know more about
- * @param {string} domain - Domain of the anchor to query for transfer details
+ * @param {Object} opts - Options object
+ * @param {string} opts.authToken - Authentication token for a Stellar account received through SEP-10 web authentication
+ * @param {string} opts.transferId - Unique ID of the transfer we want to know more about
+ * @param {string} opts.domain - Domain of the anchor to query for transfer details
  * @returns {Promise<Object>} - JSON object with information about the transfer
  */
-export async function getTransferStatus6(
-    authToken,
-    transferId,
-    domain
-) {
-    let transferServer = await getTransferServerSep6(domain)
+export async function getTransferStatus6(opts) {
+    let transferServer = await getTransferServerSep6(opts.domain)
 
     let res = await fetch(
         `${transferServer}/transaction?${new URLSearchParams({
-            id: transferId,
+            id: opts.transferId,
         })}`,
         {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                Authorization: `Bearer ${authToken}`,
+                Authorization: `Bearer ${opts.authToken}`,
             },
         }
     )
